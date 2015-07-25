@@ -3,9 +3,8 @@
 
 from __future__ import unicode_literals
 
-import sys
 import json
-import os
+
 # from fileinput import close
 import zipfile
 
@@ -412,53 +411,3 @@ class JsonInoConvertor(object):
                 self.booleanTests[element[0]](element)
             else:
                 print "Warning script : bloc", element[0], "non géré..."
-
-
-def ExtractionDuNom(lien):
-    # ind = 0
-    taille = len(lien)-1
-    nomFile = ""
-
-    while taille > 0:
-        if lien[taille] == "/":
-            break
-        taille = taille-1
-
-    while taille < len(lien)-5:
-        nomFile = nomFile + lien[taille+1]
-        taille = taille+1
-        print (taille)
-
-    return nomFile
-
-
-def main():
-    # args = sys.argv[1:]
-    # argc = len(args)
-
-    # if argc < 1 :
-    #    print "Use error :", sys.argv[0], "fileIN.xml [fileOUT.ino]"
-    #   exit( 1 )
-
-    # fileINName = args[0]
-    # fileOUTName = args[0] + ".ino"
-
-    # if argc > 1 :
-    #   fileOUTName = args[1]
-    fileName = ExtractionDuNom(sys.argv[1].decode('utf8'))
-    convertor = JsonInoConvertor(typeArduino=sys.argv[2])
-    # controls_scratch/controls.sb2
-    # print ExtractionDuNom(sys.argv[1].decode('utf8'))
-    if not os.path.exists("sketch/" + fileName):
-        os.makedirs("sketch/" + fileName)
-
-    convertor.convertSpriteScripts(
-            sys.argv[1].decode('utf8'),
-            "sketch/" + fileName + "/" + fileName + ".ino")
-    os.chdir("sketch")
-    os.chdir(fileName)
-    os.startfile(fileName + ".ino")
-    # convertor.convertSpriteScripts( "controls.sb2", "test/testcontrols.ino" )
-
-if __name__ == '__main__':
-    main()
