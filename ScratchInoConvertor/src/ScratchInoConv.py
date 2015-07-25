@@ -17,42 +17,48 @@ import os
 # end wxGlade
 
 
-class test3(wx.Frame):
+class MainWindow(wx.Frame):
 
     def __init__(self, *args, **kwds):
         # begin wxGlade: test3.__init__
-        kwds["style"] = wx.DEFAULT_FRAME_STYLE
+        kwds["style"] = (wx.MINIMIZE_BOX |
+                         wx.SYSTEM_MENU |
+                         wx.CLOSE_BOX)
         wx.Frame.__init__(self, *args, **kwds)
+        self.file = None
         self.bitmap_button_local = wx.BitmapButton(
-            self, wx.ID_ANY, wx.Bitmap("load_local.jpg", wx.BITMAP_TYPE_ANY))
+            self, wx.ID_ANY, wx.Bitmap("res/load_local.png",
+                                       wx.BITMAP_TYPE_ANY))
         self.bitmap_button_web = wx.BitmapButton(
-            self, wx.ID_ANY, wx.Bitmap("load_web.png", wx.BITMAP_TYPE_ANY))
+            self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
+                                       wx.BITMAP_TYPE_ANY))
         self.label_1 = wx.StaticText(
-            self, wx.ID_ANY, (u"Aucun fichier charg\xe9"))
+            self, wx.ID_ANY, (u"No file loaded"))
         self.radio_box_1 = wx.RadioBox(
             self, wx.ID_ANY,
-            ("Type Arduino"),
-            choices=[("Uno"), ("Autre")],
+            ("Arduino type"),
+            choices=[("Uno"), ("Other")],
             majorDimension=2,
             style=wx.RA_SPECIFY_ROWS)
         self.bitmap_button_1 = wx.BitmapButton(
-            self, wx.ID_ANY, wx.Bitmap("go.png", wx.BITMAP_TYPE_ANY))
+            self, wx.ID_ANY, wx.Bitmap("res/go.png", wx.BITMAP_TYPE_ANY))
         self.label_3 = wx.StaticText(
-            self, wx.ID_ANY, (u"Aucun Fichier Envoy\xe9"))
+            self, wx.ID_ANY, (u"No file sended"))
 
         self.__set_properties()
         self.__do_layout()
 
         self.Bind(
             wx.EVT_BUTTON, self.OnChargementLocal, self.bitmap_button_local)
-        self.Bind(wx.EVT_BUTTON, self.OnChargementWeb, self.bitmap_button_web)
+        self.Bind(wx.EVT_BUTTON, self.OnChargementWeb,
+                  self.bitmap_button_web)
         self.Bind(wx.EVT_BUTTON, self.TypeArduino, self.radio_box_1)
         self.Bind(wx.EVT_BUTTON, self.OnUpload, self.bitmap_button_1)
         # end wxGlade
 
     def __set_properties(self):
         # begin wxGlade: test3.__set_properties
-        self.SetTitle(("PFE_2015"))
+        self.SetTitle(("ScratchV2 To Ino"))
         self.bitmap_button_local.SetMinSize((140, 140))
         self.bitmap_button_web.SetMinSize((140, 140))
         self.radio_box_1.SetSelection(0)
@@ -87,7 +93,8 @@ class test3(wx.Frame):
     def OnChargementLocal(self, event):  # wxGlade: test3.<event_handler>
         # print "Event handler 'OnChargementLocal' not implemented!"
         dlg = wx.FileDialog(
-            self, "Choose a file", os.getcwd(), "", "*.sb2", wx.OPEN)
+            self, "Open ScratchV2 project", os.getcwd(), "",
+            "*.sb2", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             mypath = os.path.basename(path)
@@ -108,7 +115,7 @@ class test3(wx.Frame):
     def OnChargementWeb(self, event):  # wxGlade: test3.<event_handler>
         # print "Event handler 'OnChargementWeb' not implemented!"
         dlg = wx.TextEntryDialog(self, 'Enter your url', 'download')
-        dlg.SetValue("Default")
+        dlg.SetValue("http://")
         if dlg.ShowModal() == wx.ID_OK:
             # self.SetStatusText('You entered: %s\n' % dlg.GetValue())
             # print (dlg.GetValue())
@@ -119,12 +126,12 @@ class test3(wx.Frame):
         dlg.Destroy()
         # event.Skip()
 
-    def OnUpload(self, event):  # wxGlade: test3.<event_handler>
-        # print "Event handler 'OnUpLoad' not implemented!"
+    def OnUpload(self, event):
+        if (self.file is None):
+            return
         TypeArduino = "0"
-        if self.radio_box_1.GetStringSelection() == "Autre":
+        if self.radio_box_1.GetStringSelection() == "Other":
             TypeArduino = "1"
-        chaine_upload = self.file
         chaine_upload = ExtractionDuNom(self.file) + ' is parsed'
         commande1 = "JsonInoConvertorWithARTKV3.py " + \
             self.file + " " + TypeArduino
@@ -228,7 +235,7 @@ if __name__ == "__main__":
 
     app = wx.App(0)
     # wx.InitAllImageHandlers()
-    PFE_2015 = test3(None, wx.ID_ANY, "")
-    app.SetTopWindow(PFE_2015)
-    PFE_2015.Show()
+    mainWindow = MainWindow(None, wx.ID_ANY, "")
+    app.SetTopWindow(mainWindow)
+    mainWindow.Show()
     app.MainLoop()
