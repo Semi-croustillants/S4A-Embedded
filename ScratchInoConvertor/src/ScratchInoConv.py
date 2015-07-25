@@ -15,6 +15,7 @@ import os
 
 # begin wxGlade: extracode
 # end wxGlade
+import JsonInoConvertorWithARTKV3 as JsonInoConvertor
 
 
 class MainWindow(wx.Frame):
@@ -23,15 +24,19 @@ class MainWindow(wx.Frame):
         # begin wxGlade: test3.__init__
         kwds["style"] = (wx.MINIMIZE_BOX |
                          wx.SYSTEM_MENU |
-                         wx.CLOSE_BOX)
+                         wx.CLOSE_BOX |
+                         wx.CAPTION |
+                         wx.CLIP_CHILDREN)
         wx.Frame.__init__(self, *args, **kwds)
+        wx.Frame.SetIcon(self,
+                         wx.Icon("res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
         self.file = None
         self.bitmap_button_local = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("res/load_local.png",
                                        wx.BITMAP_TYPE_ANY))
-        self.bitmap_button_web = wx.BitmapButton(
-            self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
-                                       wx.BITMAP_TYPE_ANY))
+        # self.bitmap_button_web = wx.BitmapButton(
+        #    self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
+        #                               wx.BITMAP_TYPE_ANY))
         self.label_1 = wx.StaticText(
             self, wx.ID_ANY, (u"No file loaded"))
         self.radio_box_1 = wx.RadioBox(
@@ -50,8 +55,8 @@ class MainWindow(wx.Frame):
 
         self.Bind(
             wx.EVT_BUTTON, self.OnChargementLocal, self.bitmap_button_local)
-        self.Bind(wx.EVT_BUTTON, self.OnChargementWeb,
-                  self.bitmap_button_web)
+        # self.Bind(wx.EVT_BUTTON, self.OnChargementWeb,
+        #          self.bitmap_button_web)
         self.Bind(wx.EVT_BUTTON, self.TypeArduino, self.radio_box_1)
         self.Bind(wx.EVT_BUTTON, self.OnUpload, self.bitmap_button_1)
         # end wxGlade
@@ -59,8 +64,8 @@ class MainWindow(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: test3.__set_properties
         self.SetTitle(("ScratchV2 To Ino"))
-        self.bitmap_button_local.SetMinSize((140, 140))
-        self.bitmap_button_web.SetMinSize((140, 140))
+        self.bitmap_button_local.SetMinSize((240, 240))
+        # self.bitmap_button_web.SetMinSize((140, 140))
         self.radio_box_1.SetSelection(0)
         self.bitmap_button_1.SetSize(self.bitmap_button_1.GetBestSize())
         # end wxGlade
@@ -73,7 +78,7 @@ class MainWindow(wx.Frame):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_14 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_14.Add(self.bitmap_button_local, 0, wx.ALL, 10)
-        sizer_14.Add(self.bitmap_button_web, 0, wx.ALL, 10)
+        # sizer_14.Add(self.bitmap_button_web, 0, wx.ALL, 10)
         grid_sizer_1.Add(sizer_14, 1, wx.EXPAND, 0)
         grid_sizer_1.Add(
             self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 20)
@@ -129,15 +134,24 @@ class MainWindow(wx.Frame):
     def OnUpload(self, event):
         if (self.file is None):
             return
-        TypeArduino = "0"
+        TypeArduino = 0
         if self.radio_box_1.GetStringSelection() == "Other":
-            TypeArduino = "1"
-        chaine_upload = ExtractionDuNom(self.file) + ' is parsed'
-        commande1 = "JsonInoConvertorWithARTKV3.py " + \
-            self.file + " " + TypeArduino
-        commande1 = commande1.encode('utf-8')
-        self.label_3.SetLabel(chaine_upload)
-        os.system(commande1)
+            TypeArduino = 1
+        fileName = ExtractionDuNomNoExtension(self.file)
+        if not os.path.exists("sketch/" + fileName):
+            os.makedirs("sketch/" + fileName)
+        convertor = JsonInoConvertor.JsonInoConvertor(typeArduino=TypeArduino)
+        convertor.convertSpriteScripts(self.file,
+                                       "sketch/" + fileName + "/" +
+                                       fileName + ".ino")
+        os.chdir("sketch")
+        os.chdir(fileName)
+        os.startfile(fileName + ".ino")
+        self.label_3.SetLabel(fileName + " is parsed")
+        # commande1 = "JsonInoConvertorWithARTKV3.py " + \
+        #     self.file + " " + TypeArduino
+        # commande1 = commande1.encode('utf-8')
+        # os.system(commande1)
         # event.Skip()
 
     def TypeArduino(self, event):
