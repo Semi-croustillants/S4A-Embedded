@@ -396,6 +396,7 @@ class JsonInoConvertor(object):
                 raise(e)
 
             else:
+                print i
                 self.nb_block = self.nb_block + 1
                 self.loopFunctionStr += "void consumer"\
                     + str(self.nb_block) + "() {\n"

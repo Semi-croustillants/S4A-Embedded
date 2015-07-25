@@ -15,6 +15,7 @@ import os
 
 # begin wxGlade: extracode
 # end wxGlade
+import JsonInoConvertorWithARTKV3 as JsonInoConvertor
 
 
 class MainWindow(wx.Frame):
@@ -129,15 +130,24 @@ class MainWindow(wx.Frame):
     def OnUpload(self, event):
         if (self.file is None):
             return
-        TypeArduino = "0"
+        TypeArduino = 0
         if self.radio_box_1.GetStringSelection() == "Other":
-            TypeArduino = "1"
-        chaine_upload = ExtractionDuNom(self.file) + ' is parsed'
-        commande1 = "JsonInoConvertorWithARTKV3.py " + \
-            self.file + " " + TypeArduino
-        commande1 = commande1.encode('utf-8')
-        self.label_3.SetLabel(chaine_upload)
-        os.system(commande1)
+            TypeArduino = 1
+        fileName = ExtractionDuNomNoExtension(self.file)
+        if not os.path.exists("sketch/" + fileName):
+            os.makedirs("sketch/" + fileName)
+        convertor = JsonInoConvertor.JsonInoConvertor(typeArduino=TypeArduino)
+        convertor.convertSpriteScripts(self.file,
+                                       "sketch/" + fileName + "/" +
+                                       fileName + ".ino")
+        os.chdir("sketch")
+        os.chdir(fileName)
+        os.startfile(fileName + ".ino")
+        self.label_3.SetLabel(fileName + " is parsed")
+        # commande1 = "JsonInoConvertorWithARTKV3.py " + \
+        #     self.file + " " + TypeArduino
+        # commande1 = commande1.encode('utf-8')
+        # os.system(commande1)
         # event.Skip()
 
     def TypeArduino(self, event):
