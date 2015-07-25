@@ -24,15 +24,17 @@ class MainWindow(wx.Frame):
         # begin wxGlade: test3.__init__
         kwds["style"] = (wx.MINIMIZE_BOX |
                          wx.SYSTEM_MENU |
-                         wx.CLOSE_BOX)
+                         wx.CLOSE_BOX |
+                         wx.CAPTION |
+                         wx.CLIP_CHILDREN)
         wx.Frame.__init__(self, *args, **kwds)
         self.file = None
         self.bitmap_button_local = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("res/load_local.png",
                                        wx.BITMAP_TYPE_ANY))
-        self.bitmap_button_web = wx.BitmapButton(
-            self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
-                                       wx.BITMAP_TYPE_ANY))
+        # self.bitmap_button_web = wx.BitmapButton(
+        #    self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
+        #                               wx.BITMAP_TYPE_ANY))
         self.label_1 = wx.StaticText(
             self, wx.ID_ANY, (u"No file loaded"))
         self.radio_box_1 = wx.RadioBox(
@@ -51,8 +53,8 @@ class MainWindow(wx.Frame):
 
         self.Bind(
             wx.EVT_BUTTON, self.OnChargementLocal, self.bitmap_button_local)
-        self.Bind(wx.EVT_BUTTON, self.OnChargementWeb,
-                  self.bitmap_button_web)
+        # self.Bind(wx.EVT_BUTTON, self.OnChargementWeb,
+        #          self.bitmap_button_web)
         self.Bind(wx.EVT_BUTTON, self.TypeArduino, self.radio_box_1)
         self.Bind(wx.EVT_BUTTON, self.OnUpload, self.bitmap_button_1)
         # end wxGlade
@@ -60,8 +62,8 @@ class MainWindow(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: test3.__set_properties
         self.SetTitle(("ScratchV2 To Ino"))
-        self.bitmap_button_local.SetMinSize((140, 140))
-        self.bitmap_button_web.SetMinSize((140, 140))
+        self.bitmap_button_local.SetMinSize((240, 240))
+        # self.bitmap_button_web.SetMinSize((140, 140))
         self.radio_box_1.SetSelection(0)
         self.bitmap_button_1.SetSize(self.bitmap_button_1.GetBestSize())
         # end wxGlade
@@ -74,7 +76,7 @@ class MainWindow(wx.Frame):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_14 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_14.Add(self.bitmap_button_local, 0, wx.ALL, 10)
-        sizer_14.Add(self.bitmap_button_web, 0, wx.ALL, 10)
+        # sizer_14.Add(self.bitmap_button_web, 0, wx.ALL, 10)
         grid_sizer_1.Add(sizer_14, 1, wx.EXPAND, 0)
         grid_sizer_1.Add(
             self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 20)
