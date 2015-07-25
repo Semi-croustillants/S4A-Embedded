@@ -143,8 +143,10 @@ class JsonInoConvertor(object):
                 + "pinMode( " + str(pin) + ", OUTPUT );\n"
 
         elif self.pins[pin] != 'OUTPUT':
-            print "Warning reportdigitalWriteConvertion : pin"\
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status"
+            e = Exception(
+                "Warning digitalWriteConvertion : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
 
         self.loopFunctionStr += i + "digitalWrite( " + str(pin) + ", "
         self.booleanTests[block[2]](block[2])
@@ -159,8 +161,10 @@ class JsonInoConvertor(object):
                 + "pinMode( " + str(pin) + ", OUTPUT );\n"
 
         elif self.pins[pin] != 'OUTPUT':
-            print "Warning reportAnalogWriteConvertion : pin"\
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status"
+            e = Exception(
+                "Warning AnalogWriteConvertion : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
 
         self.loopFunctionStr += i + "AnalogWrite( " + str(pin) + ", "
         if (not isinstance(block[1], basestring) & (
@@ -192,8 +196,10 @@ class JsonInoConvertor(object):
                 + "pinMode( " + str(pin) + ", INPUT );\n"
 
         elif self.pins[pin] != 'INPUT':
-            print "Warning reportDigitalReadingConvertion : pin"\
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status"
+            e = Exception(
+                "Warning reportDigitalReadingConvertion : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
 
         # print "digitalRead( "
         self.loopFunctionStr += "digitalRead( "
@@ -320,7 +326,9 @@ class JsonInoConvertor(object):
             # print element
             self.booleanTests[block[1][0]](block[1])
         else:
-            print "Warning script : bloc", block[1][0], "non géré..."
+            e = Exception(
+                "Warning script : bloc", block[1][0], "non géré...")
+            raise(e)
         self.loopFunctionStr += ")"
 
     def doReadVariable(self, block, i):
@@ -378,10 +386,14 @@ class JsonInoConvertor(object):
             # print receiveGoBlock[0]
             # print doForeverBlock[1]
             if receiveGoBlock[0] != "whenGreenFlag" or (not receiveGoBlock[0]):
-                print "Warning convertThreadScript : expected block receiveGo"
+                e = Exception(
+                    "Warning convertThreadScript : expected block receiveGo")
+                raise(e)
 
             elif doForeverBlock[0] != 'doForever' or (not doForeverBlock[0]):
-                print "Warning convertThreadScript : expected block doForever"
+                e = Exception(
+                    "Warning convertThreadScript : expected block doForever")
+                raise(e)
 
             else:
                 self.nb_block = self.nb_block + 1
@@ -410,4 +422,6 @@ class JsonInoConvertor(object):
                 # print element
                 self.booleanTests[element[0]](element)
             else:
-                print "Warning script : bloc", element[0], "non géré..."
+                e = Exception(
+                    "Warning script : bloc", element[0], "non géré...")
+                raise(e)
