@@ -28,13 +28,17 @@ class test3(wx.Frame):
         self.bitmap_button_web = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("load_web.png", wx.BITMAP_TYPE_ANY))
         self.label_1 = wx.StaticText(
-            self, wx.ID_ANY, _(u"Aucun fichier charg\xe9"))
-        self.radio_box_1 = wx.RadioBox(self, wx.ID_ANY, _("Type Arduino"), choices=[
-                                       _("Uno"), _("Autre")], majorDimension=2, style=wx.RA_SPECIFY_ROWS)
+            self, wx.ID_ANY, (u"Aucun fichier charg\xe9"))
+        self.radio_box_1 = wx.RadioBox(
+            self, wx.ID_ANY,
+            ("Type Arduino"),
+            choices=[("Uno"), ("Autre")],
+            majorDimension=2,
+            style=wx.RA_SPECIFY_ROWS)
         self.bitmap_button_1 = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("go.png", wx.BITMAP_TYPE_ANY))
         self.label_3 = wx.StaticText(
-            self, wx.ID_ANY, _(u"Aucun Fichier Envoy\xe9"))
+            self, wx.ID_ANY, (u"Aucun Fichier Envoy\xe9"))
 
         self.__set_properties()
         self.__do_layout()
@@ -48,7 +52,7 @@ class test3(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: test3.__set_properties
-        self.SetTitle(_("PFE_2015"))
+        self.SetTitle(("PFE_2015"))
         self.bitmap_button_local.SetMinSize((140, 140))
         self.bitmap_button_web.SetMinSize((140, 140))
         self.radio_box_1.SetSelection(0)
@@ -88,13 +92,16 @@ class test3(wx.Frame):
             path = dlg.GetPath()
             mypath = os.path.basename(path)
             chemin = dlg.GetDirectory()
-            #print (chemin)
+            # print (chemin)
             self.file = chemin + '/' + mypath
-            #print (self.file)
-            #self.SetStatusText("You selected: %s" % mypath)
+            # print (self.file)
+            # self.SetStatusText("You selected: %s" % mypath)
             chaine_charge = mypath + ' is charged   '
-            #self.label_1.SetMinSize((200, 20))
-            #grid_sizer_1.Add(self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 10)
+            # self.label_1.SetMinSize((200, 20))
+            # grid_sizer_1.Add(
+            #    self.label_1,
+            #    0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL |
+            #    wx.ALIGN_CENTER_VERTICAL, 10)
             self.label_1.SetLabel(chaine_charge)
         dlg.Destroy()
 
@@ -103,8 +110,8 @@ class test3(wx.Frame):
         dlg = wx.TextEntryDialog(self, 'Enter your url', 'download')
         dlg.SetValue("Default")
         if dlg.ShowModal() == wx.ID_OK:
-            #self.SetStatusText('You entered: %s\n' % dlg.GetValue())
-            #print (dlg.GetValue())
+            # self.SetStatusText('You entered: %s\n' % dlg.GetValue())
+            # print (dlg.GetValue())
             download(dlg.GetValue(), ExtractionDuNom(dlg.GetValue()))
             self.file = ExtractionDuNom(dlg.GetValue())
             chaine_charge = self.file + ' is charged    '
@@ -113,7 +120,7 @@ class test3(wx.Frame):
         # event.Skip()
 
     def OnUpload(self, event):  # wxGlade: test3.<event_handler>
-    # print "Event handler 'OnUpLoad' not implemented!"
+        # print "Event handler 'OnUpLoad' not implemented!"
         TypeArduino = "0"
         if self.radio_box_1.GetStringSelection() == "Autre":
             TypeArduino = "1"
@@ -156,8 +163,12 @@ def download(url, dest):
             count += 1
             if count >= max:
                 count = 99
-            (keepGoing, skip) = dlg.Update(count, "Downloaded " + str(count * downloadBytes / 1024) +
-                                                  " of " + str(kBytes) + "KB")
+                (keepGoing, skip) = dlg.Update(
+                    count,
+                    "Downloaded " +
+                    str(count * downloadBytes / 1024) +
+                    " of " + str(kBytes) +
+                    "KB")
             b = fURL.read(downloadBytes)
             if b:
                 outFile.write(b)
@@ -180,7 +191,6 @@ def download(url, dest):
 
 
 def ExtractionDuNom(lien):
-    ind = 0
     taille = len(lien) - 1
     nomFile = ""
 
@@ -198,7 +208,6 @@ def ExtractionDuNom(lien):
 
 
 def ExtractionDuNomNoExtension(lien):
-    ind = 0
     taille = len(lien) - 1
     nomFile = ""
 
