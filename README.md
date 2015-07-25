@@ -3,12 +3,12 @@ Allows embedding for scratch v2 programms on arduinos boards.
 
 Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S intallation & documentation](http://thomaspreece.com/resources.php)**)
 
-** Needed **: python, wxPython (32 bit), py2exe
+**Needed**: python, wxPython (32 bit), py2exe
 
-** Supported python versions **: python 2.7
+**Supported python versions**: python 2.7
 
-** Tested on ** : arduino UNO
- 
+**Tested on** : arduino UNO
+
 # Features
 
 * GUI
@@ -19,24 +19,24 @@ Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S intallation & documen
 
 # Getting Started
 
-###Installation
+### Installation
 * Install Arduino IDE
 * Install Python 2.7
 * TODO GUI installation guide
 * TODO kernel's installation guide
 
-###Usage
+### Usage
 * Just launch ScratchInoConv.exe
 * TODO images based doc
 
-###Modifying
+### Modifying
 * Feel free to enhance our work
 * All sources are available in the ** src ** directory
 
-###Tests
+### Tests
 Tests data are available in exemple.sb2 and ImportBlocks.sb2 files
 
-#Translatable scratch v2 blocks
+# Translatable scratch v2 blocks
 * Arduino's blocks
     * digitalWrite
     * digitalRead
@@ -55,5 +55,8 @@ Tests data are available in exemple.sb2 and ImportBlocks.sb2 files
     * doWaitUntil
     * boolean ops : &,=,|,<,>,not,low,high
 
-###Context
+### Context
 This tool has been developped by some french students in computer engineering school for a final project.
+
+### Icons
+Thanks to download.4-designer.com for the "KOMIK" icons
