@@ -18,21 +18,29 @@ import os
 
 
 class test3(wx.Frame):
+
     def __init__(self, *args, **kwds):
         # begin wxGlade: test3.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        self.bitmap_button_local = wx.BitmapButton(self, wx.ID_ANY, wx.Bitmap("load_local.jpg", wx.BITMAP_TYPE_ANY))
-        self.bitmap_button_web = wx.BitmapButton(self, wx.ID_ANY, wx.Bitmap("load_web.png", wx.BITMAP_TYPE_ANY))
-        self.label_1 = wx.StaticText(self, wx.ID_ANY, _(u"Aucun fichier charg\xe9"))
-        self.radio_box_1 = wx.RadioBox(self, wx.ID_ANY, _("Type Arduino"), choices=[_("Uno"), _("Autre")], majorDimension=2, style=wx.RA_SPECIFY_ROWS)
-        self.bitmap_button_1 = wx.BitmapButton(self, wx.ID_ANY, wx.Bitmap("go.png", wx.BITMAP_TYPE_ANY))
-        self.label_3 = wx.StaticText(self, wx.ID_ANY, _(u"Aucun Fichier Envoy\xe9"))
+        self.bitmap_button_local = wx.BitmapButton(
+            self, wx.ID_ANY, wx.Bitmap("load_local.jpg", wx.BITMAP_TYPE_ANY))
+        self.bitmap_button_web = wx.BitmapButton(
+            self, wx.ID_ANY, wx.Bitmap("load_web.png", wx.BITMAP_TYPE_ANY))
+        self.label_1 = wx.StaticText(
+            self, wx.ID_ANY, _(u"Aucun fichier charg\xe9"))
+        self.radio_box_1 = wx.RadioBox(self, wx.ID_ANY, _("Type Arduino"), choices=[
+                                       _("Uno"), _("Autre")], majorDimension=2, style=wx.RA_SPECIFY_ROWS)
+        self.bitmap_button_1 = wx.BitmapButton(
+            self, wx.ID_ANY, wx.Bitmap("go.png", wx.BITMAP_TYPE_ANY))
+        self.label_3 = wx.StaticText(
+            self, wx.ID_ANY, _(u"Aucun Fichier Envoy\xe9"))
 
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_BUTTON, self.OnChargementLocal, self.bitmap_button_local)
+        self.Bind(
+            wx.EVT_BUTTON, self.OnChargementLocal, self.bitmap_button_local)
         self.Bind(wx.EVT_BUTTON, self.OnChargementWeb, self.bitmap_button_web)
         self.Bind(wx.EVT_BUTTON, self.TypeArduino, self.radio_box_1)
         self.Bind(wx.EVT_BUTTON, self.OnUpload, self.bitmap_button_1)
@@ -57,12 +65,15 @@ class test3(wx.Frame):
         sizer_14.Add(self.bitmap_button_local, 0, wx.ALL, 10)
         sizer_14.Add(self.bitmap_button_web, 0, wx.ALL, 10)
         grid_sizer_1.Add(sizer_14, 1, wx.EXPAND, 0)
-        grid_sizer_1.Add(self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 20)
-        sizer_1.Add(self.radio_box_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
+        grid_sizer_1.Add(
+            self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 20)
+        sizer_1.Add(
+            self.radio_box_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
         sizer_1.Add(self.bitmap_button_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer_15.Add(sizer_1, 1, wx.EXPAND, 0)
         grid_sizer_1.Add(sizer_15, 1, wx.EXPAND, 0)
-        grid_sizer_1.Add(self.label_3, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
+        grid_sizer_1.Add(
+            self.label_3, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
         sizer_13.Add(grid_sizer_1, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_13)
         sizer_13.Fit(self)
@@ -70,59 +81,61 @@ class test3(wx.Frame):
         # end wxGlade
 
     def OnChargementLocal(self, event):  # wxGlade: test3.<event_handler>
-        #print "Event handler 'OnChargementLocal' not implemented!"
-        dlg = wx.FileDialog(self, "Choose a file", os.getcwd() , "", "*.sb2", wx.OPEN)		
+        # print "Event handler 'OnChargementLocal' not implemented!"
+        dlg = wx.FileDialog(
+            self, "Choose a file", os.getcwd(), "", "*.sb2", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
-                path = dlg.GetPath()
-                mypath = os.path.basename(path)
-                chemin = dlg.GetDirectory()
-                #print (chemin)
-                self.file = chemin+'/'+mypath
-                #print (self.file)
-                #self.SetStatusText("You selected: %s" % mypath)
-                chaine_charge = mypath+' is charged	'
-                #self.label_1.SetMinSize((200, 20))
-                #grid_sizer_1.Add(self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 10)
-                self.label_1.SetLabel(chaine_charge)
+            path = dlg.GetPath()
+            mypath = os.path.basename(path)
+            chemin = dlg.GetDirectory()
+            #print (chemin)
+            self.file = chemin + '/' + mypath
+            #print (self.file)
+            #self.SetStatusText("You selected: %s" % mypath)
+            chaine_charge = mypath + ' is charged   '
+            #self.label_1.SetMinSize((200, 20))
+            #grid_sizer_1.Add(self.label_1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 10)
+            self.label_1.SetLabel(chaine_charge)
         dlg.Destroy()
 
     def OnChargementWeb(self, event):  # wxGlade: test3.<event_handler>
-        #print "Event handler 'OnChargementWeb' not implemented!"
-        dlg = wx.TextEntryDialog(self, 'Enter your url','download')
+        # print "Event handler 'OnChargementWeb' not implemented!"
+        dlg = wx.TextEntryDialog(self, 'Enter your url', 'download')
         dlg.SetValue("Default")
         if dlg.ShowModal() == wx.ID_OK:
             #self.SetStatusText('You entered: %s\n' % dlg.GetValue())
             #print (dlg.GetValue())
-			download(dlg.GetValue(), ExtractionDuNom(dlg.GetValue()))
-			self.file = ExtractionDuNom(dlg.GetValue())
-			chaine_charge = self.file+' is charged	'
-			self.label_1.SetLabel(chaine_charge)
+            download(dlg.GetValue(), ExtractionDuNom(dlg.GetValue()))
+            self.file = ExtractionDuNom(dlg.GetValue())
+            chaine_charge = self.file + ' is charged    '
+            self.label_1.SetLabel(chaine_charge)
         dlg.Destroy()
-        #event.Skip()
+        # event.Skip()
 
     def OnUpload(self, event):  # wxGlade: test3.<event_handler>
-    #print "Event handler 'OnUpLoad' not implemented!"
+    # print "Event handler 'OnUpLoad' not implemented!"
         TypeArduino = "0"
         if self.radio_box_1.GetStringSelection() == "Autre":
             TypeArduino = "1"
         chaine_upload = self.file
-        chaine_upload = ExtractionDuNom(self.file)+' is parsed'
-        commande1 = "JsonInoConvertorWithARTKV3.py "+self.file+" "+TypeArduino
+        chaine_upload = ExtractionDuNom(self.file) + ' is parsed'
+        commande1 = "JsonInoConvertorWithARTKV3.py " + \
+            self.file + " " + TypeArduino
         commande1 = commande1.encode('utf-8')
         self.label_3.SetLabel(chaine_upload)
         os.system(commande1)
-        #event.Skip()
-	
+        # event.Skip()
+
     def TypeArduino(self, event):
         print self.radio_box_1.GetStringSelection()
         event.Skip()
-		
-		
+
+
 # end of class test3
 def download(url, dest):
     dlg = wx.ProgressDialog("Download Progress",
-                       "Please wait...",
-                           style = wx.PD_CAN_ABORT
+                            "Please wait...",
+                            style=wx.PD_CAN_ABORT
                             | wx.PD_APP_MODAL
                             | wx.PD_ELAPSED_TIME
                             | wx.PD_ESTIMATED_TIME
@@ -136,74 +149,76 @@ def download(url, dest):
     keepGoing = True
     if "Content-Length" in header:
         size = int(header["Content-Length"])
-        kBytes = size/1024
-        downloadBytes = size/max
+        kBytes = size / 1024
+        downloadBytes = size / max
         count = 0
         while keepGoing:
             count += 1
             if count >= max:
-                count  = 99
-            (keepGoing, skip) = dlg.Update(count, "Downloaded "+str(count*downloadBytes/1024)+
-                                                  " of "+ str(kBytes)+"KB")
+                count = 99
+            (keepGoing, skip) = dlg.Update(count, "Downloaded " + str(count * downloadBytes / 1024) +
+                                                  " of " + str(kBytes) + "KB")
             b = fURL.read(downloadBytes)
             if b:
                 outFile.write(b)
             else:
                 break
     else:
-            while keepGoing:
-                (keepGoing, skip) = dlg.UpdatePulse()
-                b = fURL.read(1024*8)
-                if b:
-                    outFile.write(b)
-                else:
-                    break
+        while keepGoing:
+            (keepGoing, skip) = dlg.UpdatePulse()
+            b = fURL.read(1024 * 8)
+            if b:
+                outFile.write(b)
+            else:
+                break
     outFile.close()
 
-    dlg.Update(99, "Downloaded "+ str(os.path.getsize(dest)/1024)+"KB")
+    dlg.Update(99, "Downloaded " + str(os.path.getsize(dest) / 1024) + "KB")
     dlg.Destroy()
-    return keepGoing    
-    #end dowload
-    
+    return keepGoing
+    # end dowload
+
+
 def ExtractionDuNom(lien):
     ind = 0
-    taille = len(lien)-1
+    taille = len(lien) - 1
     nomFile = ""
-    
+
     while taille > 0:
-        if lien[taille] == "/":          
+        if lien[taille] == "/":
             break
-        taille = taille-1    
-        
-    while taille < len(lien)-1:
-        nomFile = nomFile + lien[taille+1] 
-        taille = taille+1
+        taille = taille - 1
+
+    while taille < len(lien) - 1:
+        nomFile = nomFile + lien[taille + 1]
+        taille = taille + 1
         print (taille)
-        
+
     return nomFile
+
 
 def ExtractionDuNomNoExtension(lien):
     ind = 0
-    taille = len(lien)-1
+    taille = len(lien) - 1
     nomFile = ""
-    
+
     while taille > 0:
-        if lien[taille] == "/":          
+        if lien[taille] == "/":
             break
-        taille = taille-1    
-        
-    while taille < len(lien)-5:
-        nomFile = nomFile + lien[taille+1] 
-        taille = taille+1
+        taille = taille - 1
+
+    while taille < len(lien) - 5:
+        nomFile = nomFile + lien[taille + 1]
+        taille = taille + 1
         print (taille)
-        
-    return nomFile  
+
+    return nomFile
 
 if __name__ == "__main__":
-    gettext.install("app") # replace with the appropriate catalog name
+    gettext.install("app")  # replace with the appropriate catalog name
 
     app = wx.App(0)
-    #wx.InitAllImageHandlers()
+    # wx.InitAllImageHandlers()
     PFE_2015 = test3(None, wx.ID_ANY, "")
     app.SetTopWindow(PFE_2015)
     PFE_2015.Show()
