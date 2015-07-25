@@ -28,6 +28,8 @@ class MainWindow(wx.Frame):
                          wx.CAPTION |
                          wx.CLIP_CHILDREN)
         wx.Frame.__init__(self, *args, **kwds)
+        wx.Frame.SetIcon(self,
+                         wx.Icon("res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
         self.file = None
         self.bitmap_button_local = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("res/load_local.png",
