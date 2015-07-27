@@ -1,0 +1,3 @@
+[submodule "ScratchInoConvertor/utils/artk"]
+	path = ScratchInoConvertor/utils/artk
+	url = git@github.com:wcraigtrader/artk.git
