@@ -20,6 +20,7 @@ class JsonInoConvertor(object):
     # nbBlockStr = str()
     pins = dict()
     var = []
+    servohashlist = []
     indentation = str()
     incr = "j"
     typeArduino = 0
@@ -41,6 +42,8 @@ class JsonInoConvertor(object):
             self.AnalogReadingConvertion,
             'A4S (Arduino For Scratch).analogWrite':
             self.AnalogWriteConvertion,
+            'A4S (Arduino For Scratch).servoWrite':
+            self.ServoWriteConvertion,
             '*': self.OpertationConvertion,
             '+': self.OpertationConvertion,
             '-': self.OpertationConvertion,
@@ -152,6 +155,20 @@ class JsonInoConvertor(object):
         self.booleanTests[block[2]](block[2])
         # self.convertBooleanTestBlock( block[1] )
         self.loopFunctionStr += " );\n"
+		
+    def	ServoWriteConvertion(self, block, i):
+        pin = block[1]
+        if not any(servo['pin'] == pin for servo in self.servohashlist):
+            self.servohashlist.append({"pin": pin})
+            self.pins[pin] = 'SERVO'
+            self.setupFunctionStr += self.indentation\
+                + "myservo" + str(pin) + ".attach(" + str(pin) + ");\n"
+        elif self.pins[pin] != 'SERVO':
+            e = Exception(
+                "Warning ServoWriteConvertion : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
+        self.loopFunctionStr += i + "myservo" + str(pin) + ".write(" + str(block[2]) + ");\n"
 
     def AnalogWriteConvertion(self, block, i):
         pin = block[1]
@@ -364,11 +381,15 @@ class JsonInoConvertor(object):
                 + "ARTK_CreateTask(consumer" + str(i) + ");\n"
         self.setupFunctionStr += "}\n"
         # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
-
+		
         print "#include <ARTK.h>\n" + self.loopFunctionStr\
             + self.setupFunctionStr
         # fileOUT.write( self.nbBlockStr + str(self.nb_block) + "\n\n")
         fileOUT.write("#include <ARTK.h>\n")
+        if len(self.servohashlist) > 0:
+            fileOUT.write("#include <Servo.h>\n")
+            for servohash in self.servohashlist:
+                fileOUT.write("Servo myservo"+str(servohash["pin"])+";\n")
         fileOUT.write(self.loopFunctionStr)
         fileOUT.write(self.setupFunctionStr)
         fileOUT.close()
