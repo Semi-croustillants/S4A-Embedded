@@ -48,6 +48,7 @@ class JsonInoConvertor(object):
             '+': self.OpertationConvertion,
             '-': self.OpertationConvertion,
             '/': self.OpertationConvertion,
+            '%': self.OpertationConvertion,
             'doRepeat': self.doRepeatConvertion,
             'doUntil': self.doUntilConvertion,
             'wait:elapsed:from:': self.doWaitConvertion,
@@ -71,7 +72,7 @@ class JsonInoConvertor(object):
 
         self.functionNameStr = "void consumer"
         # self.nbBlockStr = "# define MAX_THREAD_LIST "
-        self.setupFunctionStr = "void Setup() {\n"
+        self.setupFunctionStr = "void SetupARTK() {\n"
         # self.loopFunctionStr = "void consumer1() {\n  while(1){\n"
         # Voir pour incrémentation des consumer: créer à chaque
         # fois l'objet loopfunction différent pour chaque groupe de blocs
@@ -93,8 +94,7 @@ class JsonInoConvertor(object):
         self.loopFunctionStr += i + "while ( "
         self.booleanTests[block[1][0]](block[1])
         self.loopFunctionStr += " ) {\n"
-        self.loopFunctionStr += i + self.indentation\
-            + "Printf(\"0 x DEADBEEF\\n\");\n"
+        self.loopFunctionStr += i + self.indentation
         self.convertScript(block[2], i)
         # self.convertScript( block[1], i + self.indentation )
         if (not (self.sleep_var)):
@@ -103,9 +103,9 @@ class JsonInoConvertor(object):
         self.loopFunctionStr += i+"}\n"
 
     def doWaitConvertion(self, block, i):
-        x = float(block[1]) * 100
+        x = float(block[1]) * 1000
         self.loopFunctionStr += i + "ARTK_Sleep("
-        self.loopFunctionStr += str(x)
+        self.loopFunctionStr += str(int(x))
         self.loopFunctionStr += ");\n"
         self.sleep_var = True
 
@@ -116,8 +116,6 @@ class JsonInoConvertor(object):
         self.booleanTests[block[1][0]](block[1])
         # self.convertBooleanTestBlock( block[0] )
         self.loopFunctionStr += " ) {\n"
-        self.loopFunctionStr += i + self.indentation\
-            + "Printf(\"0 x DEADBEEF\\n\");\n"
         self.loopFunctionStr += i + self.indentation + "ARTK_Sleep(50);\n"
         self.loopFunctionStr += i + "}\n"
 
@@ -155,7 +153,7 @@ class JsonInoConvertor(object):
         self.booleanTests[block[2]](block[2])
         # self.convertBooleanTestBlock( block[1] )
         self.loopFunctionStr += " );\n"
-		
+
     def	ServoWriteConvertion(self, block, i):
         pin = block[1]
         if not any(servo['pin'] == pin for servo in self.servohashlist):
@@ -310,7 +308,7 @@ class JsonInoConvertor(object):
         self.loopFunctionStr += i + str(block[1])
         self.loopFunctionStr += "="
 
-        if (not isinstance(block[2], basestring) & (
+        if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
             # print "c'est un bloc"
             # print block[2]
@@ -375,13 +373,13 @@ class JsonInoConvertor(object):
             self.convertThreadScript(threadScript[2], self.indentation)
 
         self.setupFunctionStr += self.indentation + "ARTK_SetOptions("\
-            + str(self.typeArduino) + ", 10) ;\n"
+            + str(self.typeArduino) + ") ;\n"
         for i in range(1, self.nb_block + 1):
             self.setupFunctionStr += self.indentation\
                 + "ARTK_CreateTask(consumer" + str(i) + ");\n"
         self.setupFunctionStr += "}\n"
         # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
-		
+
         print "#include <ARTK.h>\n" + self.loopFunctionStr\
             + self.setupFunctionStr
         # fileOUT.write( self.nbBlockStr + str(self.nb_block) + "\n\n")
@@ -422,8 +420,6 @@ class JsonInoConvertor(object):
                 self.loopFunctionStr += "void consumer"\
                     + str(self.nb_block) + "() {\n"
                 self.loopFunctionStr += i + "while(1){\n"
-                self.loopFunctionStr += i + i\
-                    + "Printf(\"0 x DEADBEEF\\n\");\n"
                 self.convertScript(doForeverBlock[1], i)
                 if (not (self.sleep_var)):
                     self.loopFunctionStr += i + self.indentation\

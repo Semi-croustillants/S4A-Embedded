@@ -147,6 +147,8 @@ class MainWindow(wx.Frame):
         os.chdir("sketch")
         os.chdir(fileName)
         os.startfile(fileName + ".ino")
+        os.chdir("..")
+        os.chdir("..")
         self.label_3.SetLabel(fileName + " is parsed")
         # commande1 = "JsonInoConvertorWithARTKV3.py " + \
         #     self.file + " " + TypeArduino
