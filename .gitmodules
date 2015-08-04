@@ -1,6 +1,3 @@
 [submodule "ScratchInoConvertor/utils/artk"]
 	path = ScratchInoConvertor/utils/artk
 	url = git@github.com:wcraigtrader/artk.git
-[submodule "utils/artk"]
-	path = utils/artk
-	url = git@github.com:Semi-croustillants/artk.git
