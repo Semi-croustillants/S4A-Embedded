@@ -37,7 +37,7 @@ class JsonInoConvertor(object):
             'doIf': self.doIfConvertion,
             'doIfElse': self.doIfElseConvertion,
             'readVariable': self.doReadVariable,
-            'setVar:to:': self.ChangeVar,
+            'setVar:to:': self.SetVar,
             'changeVar:by:': self.ChangeVar,
             'A4S (Arduino For Scratch).analogRead':
             self.AnalogReadingConvertion,
@@ -348,6 +348,33 @@ class JsonInoConvertor(object):
             self.loopFunctionStr += str(block[2])
         self.loopFunctionStr += " )"
 
+    def SetVar(self, block, i):
+        if (not (block[1] in self.var)):
+            self.var.append(block[1])
+            if isinstance(block[2], basestring):
+                if "." not in str(block[2]):
+                    self.loopFunctionStr += i + "int " + block[1] + " = "
+                else:
+                    self.loopFunctionStr += i + "float " + block[1] + " = "
+            elif isinstance(block[2], int):
+                self.loopFunctionStr += i + "int " + block[1] + " = "
+            # self.setupFunctionStr += self.indentation + "int "+block[1]+";\n"
+
+        # print block[1]
+        # print "="
+
+        if (not isinstance(block[2], basestring) and (
+                                            not isinstance(block[2], int))):
+            # print "c'est un bloc"
+            # print block[2]
+            self.instructions[block[2][0]](block[2], "")
+            self.loopFunctionStr += ";\n"
+        else:
+            # print "c'est pas un bloc"
+            # print block[2]
+            self.loopFunctionStr += str(block[2])
+            self.loopFunctionStr += ";\n"
+
     def ChangeVar(self, block, i):
         # print block
         if (not (block[1] in self.var)):
@@ -406,7 +433,13 @@ class JsonInoConvertor(object):
 
     def doReadVariable(self, block, i):
         # print block
-        self.loopFunctionStr += i + block[1]
+        if (not (block[1] in self.var)):
+            e = Exception(
+                "Warning readVariable : variable", block[1],
+                "read but not declared")
+            raise(e)
+        else:
+            self.loopFunctionStr += i + block[1]
 
     def reportFalseConvertion(self, block):
 
