@@ -13,6 +13,7 @@ class JsonInoConvertor(object):
 
     instructions = dict()
     booleanTests = dict()
+    globalVarStr = str()
     setupFunctionStr = str()
     loopFunctionStr = str()
     functionNameStr = str()
@@ -351,12 +352,19 @@ class JsonInoConvertor(object):
         # print block
         if (not (block[1] in self.var)):
             self.var.append(block[1])
-            self.setupFunctionStr += self.indentation + "int "+block[1]+";\n"
+            if isinstance(block[2], basestring):
+                if "." not in str(block[2]):
+                    self.globalVarStr += "int " + block[1] + ";\n"
+                else:
+                    self.globalVarStr += "float " + block[1] + ";\n"
+            elif isinstance(block[2], int):
+                self.globalVarStr += "int " + block[1] + ";\n"
+            # self.setupFunctionStr += self.indentation + "int "+block[1]+";\n"
 
         # print block[1]
         # print "="
         self.loopFunctionStr += i + str(block[1])
-        self.loopFunctionStr += "="
+        self.loopFunctionStr += " = "
 
         if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
@@ -430,7 +438,8 @@ class JsonInoConvertor(object):
         self.setupFunctionStr += "}\n"
         # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
 
-        print "#include <ARTK.h>\n" + self.loopFunctionStr\
+        print "#include <ARTK.h>\n" + self.globalVarStr\
+            + self.loopFunctionStr\
             + self.setupFunctionStr
         # fileOUT.write( self.nbBlockStr + str(self.nb_block) + "\n\n")
         fileOUT.write("#include <ARTK.h>\n")
@@ -438,6 +447,7 @@ class JsonInoConvertor(object):
             fileOUT.write("#include <Servo.h>\n")
             for servohash in self.servohashlist:
                 fileOUT.write("Servo myservo"+str(servohash["pin"])+";\n")
+        fileOUT.write(self.globalVarStr)
         fileOUT.write(self.loopFunctionStr)
         fileOUT.write(self.setupFunctionStr)
         fileOUT.close()
