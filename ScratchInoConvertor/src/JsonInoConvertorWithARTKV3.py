@@ -494,31 +494,37 @@ class JsonInoConvertor(object):
         # print threadScript
         if (len(threadScript) >= 2):
             receiveGoBlock = threadScript[0]
-            doForeverBlock = threadScript[1]
             # print receiveGoBlock[0]
             # print doForeverBlock[1]
             if receiveGoBlock[0] != "whenGreenFlag" or (not receiveGoBlock[0]):
                 e = Exception(
                     "Warning convertThreadScript : expected block receiveGo")
                 raise(e)
-
-            elif doForeverBlock[0] != 'doForever' or (not doForeverBlock[0]):
-                e = Exception(
-                    "Warning convertThreadScript : expected block doForever")
-                raise(e)
-
             else:
-                print i
                 self.nb_block = self.nb_block + 1
-                self.loopFunctionStr += "void consumer"\
+                self.loopFunctionStr += "void consumer" \
                     + str(self.nb_block) + "() {\n"
-                self.loopFunctionStr += i + "while(1){\n"
-                self.convertScript(doForeverBlock[1], i)
-                if (not (self.sleep_var)):
-                    self.loopFunctionStr += i + self.indentation\
-                        + "ARTK_Yield();\n"
+                for bl in range(1, len(threadScript)):
+                    afterGoBlock = threadScript[bl]
+                    if afterGoBlock[0] != 'doForever' or (
+                                            not afterGoBlock[0]):
+                        if afterGoBlock[0] == 'setVar:to:':
+                            self.instructions['setVar:to:'](
+                                afterGoBlock, self.indentation)
+                        else:
+                            e = Exception(
+                                "Warning convertThreadScript : "
+                                "expected block doForever")
+                            print "var"
+                    else:
+                        print i
+                        self.loopFunctionStr += i + "while(1){\n"
+                        self.convertScript(afterGoBlock[1], i)
+                        if (not (self.sleep_var)):
+                            self.loopFunctionStr += i + self.indentation\
+                                + "ARTK_Yield();\n"
 
-                self.sleep_var = False
+                        self.sleep_var = False
                 self.loopFunctionStr += i + "}\n}\n"
 
     def convertScript(self, script, i):
