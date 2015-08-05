@@ -44,6 +44,10 @@ class JsonInoConvertor(object):
             self.AnalogWriteConvertion,
             'A4S (Arduino For Scratch).servoWrite':
             self.ServoWriteConvertion,
+            'A4S (Arduino For Scratch).tone':
+            self.toneConvertion,
+            'A4S (Arduino For Scratch).notone':
+            self.notoneConvertion,
             '*': self.OpertationConvertion,
             '+': self.OpertationConvertion,
             '-': self.OpertationConvertion,
@@ -154,7 +158,44 @@ class JsonInoConvertor(object):
         # self.convertBooleanTestBlock( block[1] )
         self.loopFunctionStr += " );\n"
 
-    def	ServoWriteConvertion(self, block, i):
+    def toneConvertion(self, block, i):
+
+        pin = block[1]
+        note = block[2]
+        if not (pin in self.pins):
+            self.pins[pin] = 'OUTPUT'
+            self.setupFunctionStr += self.indentation\
+                + "pinMode( " + str(pin) + ", OUTPUT );\n"
+
+        elif self.pins[pin] != 'OUTPUT':
+            e = Exception(
+                "Warning tone : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
+        self.loopFunctionStr += i + "tone( " + str(pin) + ", "
+        if isinstance(note, int) or isinstance(note, basestring):
+            self.loopFunctionStr += str(note)
+        else:
+            self.instructions[block[2][0]](block[2], "")
+        self.loopFunctionStr += " );\n"
+
+    def notoneConvertion(self, block, i):
+
+        pin = block[1]
+        if not (pin in self.pins):
+            self.pins[pin] = 'OUTPUT'
+            self.setupFunctionStr += self.indentation\
+                + "pinMode( " + str(pin) + ", OUTPUT );\n"
+
+        elif self.pins[pin] != 'OUTPUT':
+            e = Exception(
+                "Warning notone : pin"
+                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+            raise(e)
+
+        self.loopFunctionStr += i + "notone( " + str(pin) + " );\n"
+
+    def ServoWriteConvertion(self, block, i):
         pin = block[1]
         if not any(servo['pin'] == pin for servo in self.servohashlist):
             self.servohashlist.append({"pin": pin})
@@ -166,7 +207,12 @@ class JsonInoConvertor(object):
                 "Warning ServoWriteConvertion : pin"
                 + str(pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
-        self.loopFunctionStr += i + "myservo" + str(pin) + ".write(" + str(block[2]) + ");\n"
+        self.loopFunctionStr += i + "myservo" + str(pin) + ".write( "
+        if isinstance(block[2], int) or isinstance(block[2], basestring):
+            self.loopFunctionStr += str(block[2])
+        else:
+            self.instructions[block[2][0]](block[2], "")
+        self.loopFunctionStr += " );\n"
 
     def AnalogWriteConvertion(self, block, i):
         pin = block[1]
@@ -182,7 +228,7 @@ class JsonInoConvertor(object):
             raise(e)
 
         self.loopFunctionStr += i + "AnalogWrite( " + str(pin) + ", "
-        if (not isinstance(block[1], basestring) & (
+        if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "")
         else:
@@ -261,7 +307,8 @@ class JsonInoConvertor(object):
 
     def OpertationConvertion(self, block, i):
         # print block
-        if ((not isinstance(block[1], basestring)) & (
+        self.loopFunctionStr += "( "
+        if ((not isinstance(block[1], basestring)) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "")
         else:
@@ -269,18 +316,20 @@ class JsonInoConvertor(object):
             self.loopFunctionStr += str(block[1])
 
         # print " == "
-        self.loopFunctionStr += block[0]
+        self.loopFunctionStr += " " + block[0] + " "
 
-        if ((not isinstance(block[2], basestring)) & (
+        if ((not isinstance(block[2], basestring)) and (
                                             not isinstance(block[2], int))):
             self.instructions[block[2][0]](block[2], "")
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
+        self.loopFunctionStr += " )"
 
     def reportEqualConvertion(self, block):
         # print block
-        if (not isinstance(block[1], basestring) & (
+        self.loopFunctionStr += "( "
+        if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "")
         else:
@@ -290,12 +339,13 @@ class JsonInoConvertor(object):
         # print " == "
         self.loopFunctionStr += " == "
 
-        if (not isinstance(block[2], basestring) & (
+        if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
             self.instructions[block[2][0]](block[2], "")
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
+        self.loopFunctionStr += " )"
 
     def ChangeVar(self, block, i):
         # print block
