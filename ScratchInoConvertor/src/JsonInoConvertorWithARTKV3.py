@@ -196,7 +196,7 @@ class JsonInoConvertor(object):
                 + str(pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
 
-        self.loopFunctionStr += i + "notone( " + str(pin) + " );\n"
+        self.loopFunctionStr += i + "noTone( " + str(pin) + " );\n"
 
     def ServoWriteConvertion(self, block, i, localVar):
         pin = block[1]
@@ -442,12 +442,10 @@ class JsonInoConvertor(object):
     def doReadVariable(self, block, i, localVar):
         # print block
         if (not (block[1] in self.var) and (not (block[1] in localVar))):
-            e = Exception(
-                "Warning readVariable : variable", block[1],
-                "read but not declared")
-            raise(e)
-        else:
-            self.loopFunctionStr += i + block[1]
+            self.var.append(block[1])
+            self.globalVarStr += "int " + block[1] + "=0;\n"
+
+        self.loopFunctionStr += i + block[1]
 
     def reportFalseConvertion(self, block, localVar):
 
