@@ -85,46 +85,46 @@ class JsonInoConvertor(object):
         self.indentation = indentation
         self.typeArduino = typeArduino
 
-    def doIfConvertion(self, block, i):
+    def doIfConvertion(self, block, i, localVar):
         self.loopFunctionStr += i + "if ( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         # self.convertBooleanTestBlock( block[0] )
         self.loopFunctionStr += " ) {\n"
-        self.convertScript(block[2], i)
+        self.convertScript(block[2], i, localVar)
         # self.convertScript( block[1], i + self.indentation )
         self.loopFunctionStr += i + "}\n"
 
-    def doUntilConvertion(self, block, i):
+    def doUntilConvertion(self, block, i, localVar):
         # print block
         self.loopFunctionStr += i + "while ( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         self.loopFunctionStr += " ) {\n"
         self.loopFunctionStr += i + self.indentation
-        self.convertScript(block[2], i)
+        self.convertScript(block[2], i, localVar)
         # self.convertScript( block[1], i + self.indentation )
         if (not (self.sleep_var)):
-            self.loopFunctionStr += i + self.indentation + "ARTK_yield();\n"
+            self.loopFunctionStr += i + self.indentation + "ARTK_Yield();\n"
         self.sleep_var = False
         self.loopFunctionStr += i+"}\n"
 
-    def doWaitConvertion(self, block, i):
+    def doWaitConvertion(self, block, i, localVar):
         x = float(block[1]) * 1000
         self.loopFunctionStr += i + "ARTK_Sleep("
         self.loopFunctionStr += str(int(x))
         self.loopFunctionStr += ");\n"
         self.sleep_var = True
 
-    def doWaitUntilConvertion(self, block, i):
+    def doWaitUntilConvertion(self, block, i, localVar):
         # print "lolilol"
         # print block
         self.loopFunctionStr += i + "while ( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         # self.convertBooleanTestBlock( block[0] )
         self.loopFunctionStr += " ) {\n"
         self.loopFunctionStr += i + self.indentation + "ARTK_Sleep(50);\n"
         self.loopFunctionStr += i + "}\n"
 
-    def doRepeatConvertion(self, block, i):
+    def doRepeatConvertion(self, block, i, localVar):
         # à revoir: tester si non à l'intérieur d'un autre dorepeat
         # (changer la variable d'incrémentation)
         this_incr = self.incr
@@ -133,14 +133,14 @@ class JsonInoConvertor(object):
 
         self.loopFunctionStr += str(block[1])
         self.loopFunctionStr += "; "+this_incr+"++) {\n"
-        self.convertScript(block[2], i + self.indentation)
+        self.convertScript(block[2], i + self.indentation, localVar)
         # self.convertScript( block[1], i + self.indentation )
         if (not (self.sleep_var)):
-            self.loopFunctionStr += i + i + "ARTK_yield();\n"
+            self.loopFunctionStr += i + i + "ARTK_Yield();\n"
         self.sleep_var = False
         self.loopFunctionStr += i+"}\n"
 
-    def digitalWriteConvertion(self, block, i):
+    def digitalWriteConvertion(self, block, i, localVar):
 
         pin = block[1]
         if not (pin in self.pins):
@@ -155,11 +155,11 @@ class JsonInoConvertor(object):
             raise(e)
 
         self.loopFunctionStr += i + "digitalWrite( " + str(pin) + ", "
-        self.booleanTests[block[2]](block[2])
+        self.booleanTests[block[2]](block[2], localVar)
         # self.convertBooleanTestBlock( block[1] )
         self.loopFunctionStr += " );\n"
 
-    def toneConvertion(self, block, i):
+    def toneConvertion(self, block, i, localVar):
 
         pin = block[1]
         note = block[2]
@@ -177,10 +177,12 @@ class JsonInoConvertor(object):
         if isinstance(note, int) or isinstance(note, basestring):
             self.loopFunctionStr += str(note)
         else:
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
         self.loopFunctionStr += " );\n"
 
-    def notoneConvertion(self, block, i):
+    def notoneConvertion(self, block, i, localVar):
 
         pin = block[1]
         if not (pin in self.pins):
@@ -196,7 +198,7 @@ class JsonInoConvertor(object):
 
         self.loopFunctionStr += i + "notone( " + str(pin) + " );\n"
 
-    def ServoWriteConvertion(self, block, i):
+    def ServoWriteConvertion(self, block, i, localVar):
         pin = block[1]
         if not any(servo['pin'] == pin for servo in self.servohashlist):
             self.servohashlist.append({"pin": pin})
@@ -212,10 +214,12 @@ class JsonInoConvertor(object):
         if isinstance(block[2], int) or isinstance(block[2], basestring):
             self.loopFunctionStr += str(block[2])
         else:
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
         self.loopFunctionStr += " );\n"
 
-    def AnalogWriteConvertion(self, block, i):
+    def AnalogWriteConvertion(self, block, i, localVar):
         pin = block[1]
         if not (pin in self.pins):
             self.pins[pin] = 'OUTPUT'
@@ -231,25 +235,27 @@ class JsonInoConvertor(object):
         self.loopFunctionStr += i + "AnalogWrite( " + str(pin) + ", "
         if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
-            self.instructions[block[1][0]](block[1], "")
+            self.instructions[block[1][0]](block[1], "", localVar)
+            if block[1][0] == "setVar:to:":
+                    localVar.append(block[1][1])
         else:
             # print block[1]
             self.loopFunctionStr += str(block[1])
         self.loopFunctionStr += " );\n"
 
-    def doIfElseConvertion(self, block, i):
+    def doIfElseConvertion(self, block, i, localVar):
 
         self.loopFunctionStr += "if ( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         self.loopFunctionStr += " ) {\n"
-        self.convertScript(block[2], i + self.indentation)
+        self.convertScript(block[2], i + self.indentation, localVar)
         # self.instructions[block[2][0]](block[2],i)
         self.loopFunctionStr += i + "}\n" + i + "else {\n"
-        self.convertScript(block[3], i + self.indentation)
+        self.convertScript(block[3], i + self.indentation, localVar)
         # self.instructions[block[3][0]](block[3],i)
         self.loopFunctionStr += i + "}\n"
 
-    def reportDigitalReadingConvertion(self, block):
+    def reportDigitalReadingConvertion(self, block, localVar):
 
         pin = block[1]
         if not (pin in self.pins):
@@ -262,37 +268,29 @@ class JsonInoConvertor(object):
                 "Warning reportDigitalReadingConvertion : pin"
                 + str(pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
+        self.loopFunctionStr += "digitalRead( " + str(pin) + " )"
 
-        # print "digitalRead( "
-        self.loopFunctionStr += "digitalRead( "
-        # print pin
-        self.loopFunctionStr += str(pin)
-        # print " )"
-        self.loopFunctionStr += " )"
-
-    def AnalogReadingConvertion(self, block, i):
-
+    def AnalogReadingConvertion(self, block, i, localVar):
         pin = block[1]
+        self.loopFunctionStr += i+"analogRead( " + str(pin) + " )"
 
-        self.loopFunctionStr += i+"analogRead( "
-        self.loopFunctionStr += str(pin)
-        self.loopFunctionStr += " )"
-
-    def reportAndConvertion(self, block):
+    def reportAndConvertion(self, block, localVar):
         # print "( "
         self.loopFunctionStr += "( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         # self.convertBooleanTestBlock( block[0] )
         # print " ) && ( "
         self.loopFunctionStr += " ) && ( "
-        self.booleanTests[block[2][0]](block[2])
+        self.booleanTests[block[2][0]](block[2], localVar)
 
         self.loopFunctionStr += " )"
 
-    def reportCompareConvertion(self, block):
+    def reportCompareConvertion(self, block, localVar):
         # print block
         if (not isinstance(block[1], basestring)):
-            self.instructions[block[1][0]](block[1], "")
+            self.instructions[block[1][0]](block[1], "", localVar)
+            if block[1][0] == "setVar:to:":
+                    localVar.append(block[1][1])
         else:
             # print block[1]
             self.loopFunctionStr += str(block[1])
@@ -301,17 +299,21 @@ class JsonInoConvertor(object):
         self.loopFunctionStr += block[0]
 
         if (not isinstance(block[2], basestring)):
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
 
-    def OpertationConvertion(self, block, i):
+    def OpertationConvertion(self, block, i, localVar):
         # print block
         self.loopFunctionStr += "( "
         if ((not isinstance(block[1], basestring)) and (
                                             not isinstance(block[1], int))):
-            self.instructions[block[1][0]](block[1], "")
+            self.instructions[block[1][0]](block[1], "", localVar)
+            if block[1][0] == "setVar:to:":
+                    localVar.append(block[1][1])
         else:
             # print block[1]
             self.loopFunctionStr += str(block[1])
@@ -321,18 +323,22 @@ class JsonInoConvertor(object):
 
         if ((not isinstance(block[2], basestring)) and (
                                             not isinstance(block[2], int))):
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
         self.loopFunctionStr += " )"
 
-    def reportEqualConvertion(self, block):
+    def reportEqualConvertion(self, block, localVar):
         # print block
         self.loopFunctionStr += "( "
         if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
-            self.instructions[block[1][0]](block[1], "")
+            self.instructions[block[1][0]](block[1], "", localVar)
+            if block[1][0] == "setVar:to:":
+                    localVar.append(block[1][1])
         else:
             # print block[1]
             self.loopFunctionStr += str(block[1])
@@ -342,15 +348,22 @@ class JsonInoConvertor(object):
 
         if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
         self.loopFunctionStr += " )"
 
-    def SetVar(self, block, i):
-        if (not (block[1] in self.var)):
-            self.var.append(block[1])
+    def SetVar(self, block, i, localVar):
+        if (block[1] in localVar):
+            e = Exception(
+                "Warning setVar ambiguous : var "
+                + str(block[1]) + " already declared locally")
+            raise(e)
+        elif (not (block[1] in self.var)):
+            localVar.append(block[1])
             if isinstance(block[2], basestring):
                 if "." not in str(block[2]):
                     self.loopFunctionStr += i + "int " + block[1] + " = "
@@ -358,26 +371,22 @@ class JsonInoConvertor(object):
                     self.loopFunctionStr += i + "float " + block[1] + " = "
             elif isinstance(block[2], int):
                 self.loopFunctionStr += i + "int " + block[1] + " = "
-            # self.setupFunctionStr += self.indentation + "int "+block[1]+";\n"
-
-        # print block[1]
-        # print "="
-
         if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
             # print "c'est un bloc"
             # print block[2]
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
             self.loopFunctionStr += ";\n"
         else:
             # print "c'est pas un bloc"
             # print block[2]
-            self.loopFunctionStr += str(block[2])
-            self.loopFunctionStr += ";\n"
+            self.loopFunctionStr += str(block[2]) + ";\n"
 
-    def ChangeVar(self, block, i):
+    def ChangeVar(self, block, i, localVar):
         # print block
-        if (not (block[1] in self.var)):
+        if (not (block[1] in localVar)) and (not (block[1] in self.var)):
             self.var.append(block[1])
             if isinstance(block[2], basestring):
                 if "." not in str(block[2]):
@@ -386,10 +395,6 @@ class JsonInoConvertor(object):
                     self.globalVarStr += "float " + block[1] + ";\n"
             elif isinstance(block[2], int):
                 self.globalVarStr += "int " + block[1] + ";\n"
-            # self.setupFunctionStr += self.indentation + "int "+block[1]+";\n"
-
-        # print block[1]
-        # print "="
         self.loopFunctionStr += i + str(block[1])
         self.loopFunctionStr += " = "
 
@@ -397,43 +402,46 @@ class JsonInoConvertor(object):
                                             not isinstance(block[2], int))):
             # print "c'est un bloc"
             # print block[2]
-            self.instructions[block[2][0]](block[2], "")
+            self.instructions[block[2][0]](block[2], "", localVar)
+            if block[2][0] == "setVar:to:":
+                    localVar.append(block[2][1])
             self.loopFunctionStr += ";\n"
         else:
             # print "c'est pas un bloc"
             # print block[2]
-            self.loopFunctionStr += str(block[2])
-            self.loopFunctionStr += ";\n"
+            self.loopFunctionStr += str(block[2]) + ";\n"
 
-    def reportOrConvertion(self, block):
+    def reportOrConvertion(self, block, localVar):
         self.loopFunctionStr += "( "
-        self.booleanTests[block[1][0]](block[1])
+        self.booleanTests[block[1][0]](block[1], localVar)
         # self.convertBooleanTestBlock( block[0] )
         # print " ) && ( "
         self.loopFunctionStr += " ) || ( "
-        self.booleanTests[block[2][0]](block[2])
+        self.booleanTests[block[2][0]](block[2], localVar)
 
         self.loopFunctionStr += " )"
 
-    def reportNot(self, block):
+    def reportNot(self, block, localVar):
         self.loopFunctionStr += "! ("
         if block[1][0] in self.instructions:
             # print "c'est une instruction:"
             # print element
-            self.instructions[block[1][0]](block[1], "")
+            self.instructions[block[1][0]](block[1], "", localVar)
+            if block[1][0] == "setVar:to:":
+                    localVar.append(block[1][1])
         elif block[1][0] in self.booleanTests:
             # print "c'est un test booleen:"
             # print element
-            self.booleanTests[block[1][0]](block[1])
+            self.booleanTests[block[1][0]](block[1], localVar)
         else:
             e = Exception(
                 "Warning script : bloc", block[1][0], "non géré...")
             raise(e)
         self.loopFunctionStr += ")"
 
-    def doReadVariable(self, block, i):
+    def doReadVariable(self, block, i, localVar):
         # print block
-        if (not (block[1] in self.var)):
+        if (not (block[1] in self.var) and (not (block[1] in localVar))):
             e = Exception(
                 "Warning readVariable : variable", block[1],
                 "read but not declared")
@@ -441,11 +449,11 @@ class JsonInoConvertor(object):
         else:
             self.loopFunctionStr += i + block[1]
 
-    def reportFalseConvertion(self, block):
+    def reportFalseConvertion(self, block, localVar):
 
         self.loopFunctionStr += "LOW"
 
-    def reportTrueConvertion(self, block):
+    def reportTrueConvertion(self, block, localVar):
 
         self.loopFunctionStr += "HIGH"
 
@@ -461,7 +469,7 @@ class JsonInoConvertor(object):
         data = json.loads(json_data)
         for threadScript in data['children'][0]['scripts']:
             print threadScript[2]
-            self.convertThreadScript(threadScript[2], self.indentation)
+            self.convertThreadScript(threadScript[2], self.indentation, [])
 
         self.setupFunctionStr += self.indentation + "ARTK_SetOptions("\
             + str(self.typeArduino) + ") ;\n"
@@ -471,10 +479,15 @@ class JsonInoConvertor(object):
         self.setupFunctionStr += "}\n"
         # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
 
-        print "#include <ARTK.h>\n" + self.globalVarStr\
+        print "#include <ARTK.h>\n"
+        if len(self.servohashlist) > 0:
+            print "#include <Servo.h>\n"
+            for servohash in self.servohashlist:
+                print "Servo myservo"+str(servohash["pin"])+";\n"
+        print self.globalVarStr\
             + self.loopFunctionStr\
             + self.setupFunctionStr
-        # fileOUT.write( self.nbBlockStr + str(self.nb_block) + "\n\n")
+        # Write in file
         fileOUT.write("#include <ARTK.h>\n")
         if len(self.servohashlist) > 0:
             fileOUT.write("#include <Servo.h>\n")
@@ -489,7 +502,7 @@ class JsonInoConvertor(object):
         # json_data.close()
         # print self.loopFunctionStr
 
-    def convertThreadScript(self, threadScript, i):
+    def convertThreadScript(self, threadScript, i, localVar):
         # print "on m'appelle"
         # print threadScript
         if (len(threadScript) >= 2):
@@ -510,16 +523,16 @@ class JsonInoConvertor(object):
                                             not afterGoBlock[0]):
                         if afterGoBlock[0] == 'setVar:to:':
                             self.instructions['setVar:to:'](
-                                afterGoBlock, self.indentation)
+                                afterGoBlock, self.indentation, localVar)
                         else:
                             e = Exception(
                                 "Warning convertThreadScript : "
-                                "expected block doForever")
-                            print "var"
+                                "expected block doForever or setVar:to")
+                            raise e
                     else:
                         print i
                         self.loopFunctionStr += i + "while(1){\n"
-                        self.convertScript(afterGoBlock[1], i)
+                        self.convertScript(afterGoBlock[1], i, localVar)
                         if (not (self.sleep_var)):
                             self.loopFunctionStr += i + self.indentation\
                                 + "ARTK_Yield();\n"
@@ -527,17 +540,21 @@ class JsonInoConvertor(object):
                         self.sleep_var = False
                 self.loopFunctionStr += i + "}\n}\n"
 
-    def convertScript(self, script, i):
+    def convertScript(self, script, i, localVar):
         for element in script:
             # print element
             if element[0] in self.instructions:
                 # print "c'est une instruction :"
                 # print element
-                self.instructions[element[0]](element, i + self.indentation)
+                self.instructions[element[0]](element,
+                                              i + self.indentation,
+                                              localVar)
+                if element[0] == "setVar:to:":
+                    localVar.append(element[1])
             elif element[0] in self.booleanTests:
                 # print "c'est un test booleen :"
                 # print element
-                self.booleanTests[element[0]](element)
+                self.booleanTests[element[0]](element, localVar)
             else:
                 e = Exception(
                     "Warning script : bloc", element[0], "non géré...")
