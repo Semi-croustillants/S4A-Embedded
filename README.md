@@ -1,7 +1,8 @@
 # S4A embedded
 Allows embedding for scratch v2 programms on arduinos boards.
 
-Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S documentation](http://thomaspreece.com/resources.php)**)
+Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S documentation](http://thomaspreece.com/resources.php)**). For tone and noTone
+use ImportBlock.sb2 in github repository.
 
 Compiled with py2exe
 
@@ -47,7 +48,7 @@ Compiled with py2exe
 * Craft your own code in scratch v2 and circuit on your arduino
 * Export it as a .sb2 file
 * Open the GUI in the **ScratchInoConvertor/dist** directory and import your .sb2 file
-* Start translation, it will open the Arduino IDE with your translated code
+* Start translation, it will open the Arduino IDE with your translated code (windows only)
 * Upload it as it was a classic .ino program
 
 ### Modifying
@@ -63,13 +64,16 @@ Tests data are available in exemple.sb2 and ImportBlocks.sb2 files
     * digitalRead
     * analogRead
     * analogWrite
+    * tone
+    * noTone
+    * servoWrite
 * Classics blocks
     * doIf
     * doIfElse
     * readVariable
     * setVar:to
     * changeVar:by
-    * ops : *,+,-,/
+    * ops : *,+,-,/,%
     * doRepeat
     * doUntil
     * wait:elapsed:from
