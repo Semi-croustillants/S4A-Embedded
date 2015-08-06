@@ -49,7 +49,7 @@ Compiled with py2exe
 * Craft your own code in scratch v2 and circuit on your arduino
 * Export it as a .sb2 file
 * Open the GUI in the **ScratchInoConvertor/dist** directory and import your .sb2 file
-* Start translation, it will open the Arduino IDE with your translated code (windows only)
+* Start translation, it will open the Arduino IDE with your translated code
 * Upload it as it was a classic .ino program
 
 ### Modifying
@@ -58,6 +58,19 @@ Compiled with py2exe
 
 ### Tests
 Tests data are available in exemple.sb2 and ImportBlocks.sb2 files
+
+### Configuration file
+When you start the GUI for the first time, two dialogs appears.
+The first ask you to select the Arduino sketch folder and the
+second ask you to select the Arduino IDE executable.
+This informations are save in the root folder of the GUI in a file named
+".config".
+The structure of the configuration file is :
+- Lines beginning with "#" are comments
+- Other lines are in the form KEY=value
+If you need to reinit configuration file, click on parameter menu and select
+"Reinit config file". This action will remove the obsolete .config file
+and ask you to select new informations
 
 # Translatable scratch v2 blocks
 * Arduino's blocks

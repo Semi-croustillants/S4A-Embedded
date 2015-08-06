@@ -11,6 +11,8 @@ import wx
 import gettext
 import urllib
 import os
+import sys
+import subprocess
 # end wxGlade
 
 # begin wxGlade: extracode
@@ -19,6 +21,10 @@ import JsonInoConvertorWithARTKV3 as JsonInoConvertor
 
 
 class MainWindow(wx.Frame):
+
+    ArduinoSketchPath = str()
+    ArduinoExecPath = str()
+    ID_REINIT_PARAMETER = wx.NewId()
 
     def __init__(self, *args, **kwds):
         # begin wxGlade: test3.__init__
@@ -34,6 +40,15 @@ class MainWindow(wx.Frame):
         self.bitmap_button_local = wx.BitmapButton(
             self, wx.ID_ANY, wx.Bitmap("res/load_local.png",
                                        wx.BITMAP_TYPE_ANY))
+
+        # Add menu
+        parameter_menu = wx.Menu()
+        parameter_menu.Append(self.ID_REINIT_PARAMETER, 'Reinit config file',
+                              'Reinit configuration file.')
+        menu_bar = wx.MenuBar()
+        menu_bar.Append(parameter_menu, 'Parameters')
+        self.SetMenuBar(menu_bar)
+        wx.EVT_MENU(self, self.ID_REINIT_PARAMETER, self.reinitConfiguration)
         # self.bitmap_button_web = wx.BitmapButton(
         #    self, wx.ID_ANY, wx.Bitmap("res/load_web.png",
         #                               wx.BITMAP_TYPE_ANY))
@@ -50,6 +65,7 @@ class MainWindow(wx.Frame):
         self.label_3 = wx.StaticText(
             self, wx.ID_ANY, (u"No file sended"))
 
+        self.initConfiguration()
         self.__set_properties()
         self.__do_layout()
 
@@ -138,23 +154,25 @@ class MainWindow(wx.Frame):
         if self.radio_box_1.GetStringSelection() == "Other":
             TypeArduino = 1
         fileName = ExtractionDuNomNoExtension(self.file)
-        if not os.path.exists("sketch/" + fileName):
-            os.makedirs("sketch/" + fileName)
+        if not os.path.exists(self.ArduinoSketchPath + os.sep + fileName):
+            os.makedirs(self.ArduinoSketchPath + os.sep + fileName)
         convertor = JsonInoConvertor.JsonInoConvertor(typeArduino=TypeArduino)
         try:
             convertor.convertSpriteScripts(self.file,
-                                           "sketch/" + fileName + "/" +
+                                           self.ArduinoSketchPath + os.sep +
+                                           fileName + os.sep +
                                            fileName + ".ino")
             self.label_3.SetLabel(fileName + " is parsed")
-            os.chdir("sketch")
-            os.chdir(fileName)
             try:
-                os.startfile(fileName + ".ino")
+                filePath = self.ArduinoSketchPath + os.sep +\
+                           fileName + os.sep + fileName + ".ino"
+                if sys.platform == "win32":
+                    os.startfile(filePath)
+                else:
+                    subprocess.call([self.ArduinoExecPath, filePath])
             except:
                 wx.MessageBox("Can't open automatically .ino file.", 'Warning',
                               wx.OK | wx.ICON_EXCLAMATION)
-            os.chdir("..")
-            os.chdir("..")
         except Exception as expt:
             error = str()
             for mess in expt.args:
@@ -174,6 +192,51 @@ class MainWindow(wx.Frame):
     def TypeArduino(self, event):
         print self.radio_box_1.GetStringSelection()
         event.Skip()
+
+    def initConfiguration(self):
+        if os.path.isfile(".config"):
+            # read data from .config
+            # Lines beginning with # are comment
+            # Other are in the form KEY=value
+            configFile = open(".config", "r")
+            for line in configFile:
+                line = line.rstrip('\n')
+                if not (line[0] == "#"):
+                    if "ARDUINO_SKETCH_PATH=" in line:
+                        self.ArduinoSketchPath = line[20:]
+                    elif "ARDUINO_EXEC_PATH=" in line:
+                        self.ArduinoExecPath = line[18:]
+            configFile.close()
+        else:
+            configFile = open(".config", "w")
+            dlg = wx.DirDialog(self, "Select Arduino Sketch Folder",
+                               style=1, defaultPath=os.getcwd())
+            if dlg.ShowModal() == wx.ID_OK:
+                self.ArduinoSketchPath = dlg.GetPath()
+                path = dlg.GetPath()
+                mypath = os.path.basename(path)
+                self.ArduinoSketchPath = path
+                configFile.write("# Arduino sketch path\n")
+                configFile.write("ARDUINO_SKETCH_PATH=" +
+                                 self.ArduinoSketchPath + "\n")
+            dlg = wx.FileDialog(self, "Select Arduino IDE executable",
+                                os.getcwd(), "", "*", wx.OPEN)
+            if dlg.ShowModal() == wx.ID_OK:
+                path = dlg.GetPath()
+                mypath = os.path.basename(path)
+                chemin = dlg.GetDirectory()
+                self.ArduinoExecPath = chemin + os.sep + mypath
+                configFile.write("# Arduino Exec path\n")
+                configFile.write("ARDUINO_EXEC_PATH=" +
+                                 self.ArduinoExecPath + "\n")
+            configFile.close()
+        print "ARDUINO_EXEC_PATH=" + self.ArduinoExecPath
+        print "ARDUINO_SKETCH_PATH=" + self.ArduinoSketchPath
+
+    def reinitConfiguration(self, event):
+        if os.path.isfile(".config"):
+            os.remove(".config")
+        self.initConfiguration()
 
 
 # end of class test3
