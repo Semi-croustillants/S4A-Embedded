@@ -542,9 +542,8 @@ class JsonInoConvertor(object):
                         print i
                         self.loopFunctionStr += i + "while(1){\n"
                         self.convertScript(afterGoBlock[1], i, localVar)
-                        if (not (self.sleep_var)):
-                            self.loopFunctionStr += i + self.indentation\
-                                + "ARTK_Yield();\n"
+                        self.loopFunctionStr += i + self.indentation\
+                            + "ARTK_Yield();\n"
 
                         self.sleep_var = False
                 self.loopFunctionStr += i + "}\n}\n"
