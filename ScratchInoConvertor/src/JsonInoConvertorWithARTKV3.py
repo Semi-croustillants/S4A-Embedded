@@ -465,35 +465,43 @@ class JsonInoConvertor(object):
         # json_data=open(jsondata)
 
         data = json.loads(json_data)
-        for threadScript in data['children'][0]['scripts']:
-            print threadScript[2]
-            self.convertThreadScript(threadScript[2], self.indentation, [])
+        curs = None
+        for kindern in range(len(data['children'])):
+            lala = data['children'][kindern]
+            if lala.get('scripts', None) is not None:
+                curs = kindern
+        if curs is not None:
+            for threadScript in data['children'][curs]['scripts']:
+                print threadScript[2]
+                self.convertThreadScript(threadScript[2], self.indentation, [])
 
-        self.setupFunctionStr += self.indentation + "ARTK_SetOptions("\
-            + str(self.typeArduino) + ") ;\n"
-        for i in range(1, self.nb_block + 1):
-            self.setupFunctionStr += self.indentation\
-                + "ARTK_CreateTask(consumer" + str(i) + ");\n"
-        self.setupFunctionStr += "}\n"
-        # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
+            self.setupFunctionStr += self.indentation + "ARTK_SetOptions("\
+                + str(self.typeArduino) + ") ;\n"
+            for i in range(1, self.nb_block + 1):
+                self.setupFunctionStr += self.indentation\
+                    + "ARTK_CreateTask(consumer" + str(i) + ");\n"
+            self.setupFunctionStr += "}\n"
+            # self.loopFunctionStr += "ARTK_Yield();\n}\n}\n"
 
-        print "#include <ARTK.h>\n"
-        if len(self.servohashlist) > 0:
-            print "#include <Servo.h>\n"
-            for servohash in self.servohashlist:
-                print "Servo myservo"+str(servohash["pin"])+";\n"
-        print self.globalVarStr\
-            + self.loopFunctionStr\
-            + self.setupFunctionStr
-        # Write in file
-        fileOUT.write("#include <ARTK.h>\n")
-        if len(self.servohashlist) > 0:
-            fileOUT.write("#include <Servo.h>\n")
-            for servohash in self.servohashlist:
-                fileOUT.write("Servo myservo"+str(servohash["pin"])+";\n")
-        fileOUT.write(self.globalVarStr)
-        fileOUT.write(self.loopFunctionStr)
-        fileOUT.write(self.setupFunctionStr)
+            print "#include <ARTK.h>\n"
+            if len(self.servohashlist) > 0:
+                print "#include <Servo.h>\n"
+                for servohash in self.servohashlist:
+                    print "Servo myservo"+str(servohash["pin"])+";\n"
+            print self.globalVarStr\
+                + self.loopFunctionStr\
+                + self.setupFunctionStr
+            # Write in file
+            fileOUT.write("#include <ARTK.h>\n")
+            if len(self.servohashlist) > 0:
+                fileOUT.write("#include <Servo.h>\n")
+                for servohash in self.servohashlist:
+                    fileOUT.write("Servo myservo"+str(servohash["pin"])+";\n")
+            fileOUT.write(self.globalVarStr)
+            fileOUT.write(self.loopFunctionStr)
+            fileOUT.write(self.setupFunctionStr)
+        else:
+            raise(Exception("Scripts not found in sb2"))
         fileOUT.close()
         # print data
 
