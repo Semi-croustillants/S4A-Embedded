@@ -45,6 +45,7 @@ Compiled with py2exe
 
 
 ### Usage
+* Import ARTK source code in librairies folder (Usually in Documents/Arduino)
 * Craft your own code in scratch v2 and circuit on your arduino
 * Export it as a .sb2 file
 * Open the GUI in the **ScratchInoConvertor/dist** directory and import your .sb2 file

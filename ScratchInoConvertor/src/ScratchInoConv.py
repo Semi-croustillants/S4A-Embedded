@@ -141,15 +141,30 @@ class MainWindow(wx.Frame):
         if not os.path.exists("sketch/" + fileName):
             os.makedirs("sketch/" + fileName)
         convertor = JsonInoConvertor.JsonInoConvertor(typeArduino=TypeArduino)
-        convertor.convertSpriteScripts(self.file,
-                                       "sketch/" + fileName + "/" +
-                                       fileName + ".ino")
-        os.chdir("sketch")
-        os.chdir(fileName)
-        os.startfile(fileName + ".ino")
-        os.chdir("..")
-        os.chdir("..")
-        self.label_3.SetLabel(fileName + " is parsed")
+        try:
+            convertor.convertSpriteScripts(self.file,
+                                           "sketch/" + fileName + "/" +
+                                           fileName + ".ino")
+            self.label_3.SetLabel(fileName + " is parsed")
+            os.chdir("sketch")
+            os.chdir(fileName)
+            try:
+                os.startfile(fileName + ".ino")
+            except:
+                wx.MessageBox("Can't open automatically .ino file.", 'Warning',
+                              wx.OK | wx.ICON_EXCLAMATION)
+            os.chdir("..")
+            os.chdir("..")
+        except Exception as expt:
+            error = str()
+            for mess in expt.args:
+                error += mess + " "
+            wx.MessageBox(error, 'Error',
+                          wx.OK | wx.ICON_ERROR)
+            self.label_3.SetLabel(fileName + " error parsing")
+
+        del convertor
+
         # commande1 = "JsonInoConvertorWithARTKV3.py " + \
         #     self.file + " " + TypeArduino
         # commande1 = commande1.encode('utf-8')
