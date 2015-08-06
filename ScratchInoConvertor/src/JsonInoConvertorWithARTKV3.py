@@ -85,6 +85,9 @@ class JsonInoConvertor(object):
         self.indentation = indentation
         self.typeArduino = typeArduino
 
+    def __del__(self):
+        super(JsonInoConvertor, self).__del__()
+
     def doIfConvertion(self, block, i, localVar):
         self.loopFunctionStr += i + "if ( "
         self.booleanTests[block[1][0]](block[1], localVar)
@@ -359,8 +362,8 @@ class JsonInoConvertor(object):
     def SetVar(self, block, i, localVar):
         if (block[1] in localVar):
             e = Exception(
-                "Warning setVar ambiguous : var "
-                + str(block[1]) + " already declared locally")
+                "Warning setVar ambiguous : var",
+                "\"" + str(block[1]) + "\"", "already declared locally")
             raise(e)
         elif (not (block[1] in self.var)):
             localVar.append(block[1])
