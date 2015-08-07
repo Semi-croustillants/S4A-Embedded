@@ -53,6 +53,8 @@ class JsonInoConvertor(object):
             'doIf': self.doIfConvertion,
             'doIfElse': self.doIfElseConvertion,
             'readVariable': self.doReadVariable,
+            'A4S (Arduino For Scratch).setVar:to:': self.customSetVar,
+            'A4S (Arduino For Scratch).changeVar:by:': self.ChangeVar,
             'setVar:to:': self.SetVar,
             'changeVar:by:': self.ChangeVar,
             'A4S (Arduino For Scratch).analogRead':
@@ -194,7 +196,7 @@ class JsonInoConvertor(object):
             self.loopFunctionStr += str(note)
         else:
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
         self.loopFunctionStr += " );\n"
 
@@ -231,7 +233,7 @@ class JsonInoConvertor(object):
             self.loopFunctionStr += str(block[2])
         else:
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
         self.loopFunctionStr += " );\n"
 
@@ -252,7 +254,7 @@ class JsonInoConvertor(object):
         if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "", localVar)
-            if block[1][0] == "setVar:to:":
+            if "setVar:to:" in block[1][0]:
                     localVar.append(block[1][1])
         else:
             # print block[1]
@@ -305,7 +307,7 @@ class JsonInoConvertor(object):
         # print block
         if (not isinstance(block[1], basestring)):
             self.instructions[block[1][0]](block[1], "", localVar)
-            if block[1][0] == "setVar:to:":
+            if "setVar:to:" in block[1][0]:
                     localVar.append(block[1][1])
         else:
             # print block[1]
@@ -316,7 +318,7 @@ class JsonInoConvertor(object):
 
         if (not isinstance(block[2], basestring)):
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
         else:
             # print block[2]
@@ -328,7 +330,7 @@ class JsonInoConvertor(object):
         if ((not isinstance(block[1], basestring)) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "", localVar)
-            if block[1][0] == "setVar:to:":
+            if "setVar:to:" in block[1][0]:
                     localVar.append(block[1][1])
         else:
             # print block[1]
@@ -340,7 +342,7 @@ class JsonInoConvertor(object):
         if ((not isinstance(block[2], basestring)) and (
                                             not isinstance(block[2], int))):
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
         else:
             # print block[2]
@@ -353,7 +355,7 @@ class JsonInoConvertor(object):
         if (not isinstance(block[1], basestring) and (
                                             not isinstance(block[1], int))):
             self.instructions[block[1][0]](block[1], "", localVar)
-            if block[1][0] == "setVar:to:":
+            if "setVar:to:" in block[1][0]:
                     localVar.append(block[1][1])
         else:
             # print block[1]
@@ -365,64 +367,111 @@ class JsonInoConvertor(object):
         if (not isinstance(block[2], basestring) and (
                                             not isinstance(block[2], int))):
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
         else:
             # print block[2]
             self.loopFunctionStr += str(block[2])
         self.loopFunctionStr += " )"
 
-    def SetVar(self, block, i, localVar):
-        if (block[1] in localVar):
-            e = Exception(
-                "Warning setVar ambiguous : var",
-                "\"" + str(block[1]) + "\"", "already declared locally")
-            raise(e)
-        elif (not (block[1] in self.var)):
-            localVar.append(block[1])
-            if isinstance(block[2], basestring):
-                if "." not in str(block[2]):
-                    self.loopFunctionStr += i + "int " + block[1] + " = "
-                else:
-                    self.loopFunctionStr += i + "float " + block[1] + " = "
-            elif isinstance(block[2], int):
-                self.loopFunctionStr += i + "int " + block[1] + " = "
-        if (not isinstance(block[2], basestring) and (
-                                            not isinstance(block[2], int))):
-            # print "c'est un bloc"
-            # print block[2]
-            self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
-                    localVar.append(block[2][1])
+    def customSetVar(self, block, i, localVar):
+        if (block[2] == "global"):
+            if (not (block[1] in self.var)):
+                self.var.append(block[1])
+                self.globalVarStr += str(block[3]) + " " + str(block[4]) +\
+                    " " + str(block[1]) + ";\n"
+            else:
+                e = Exception(
+                    "Warning setVar ambiguous : var",
+                    "\"" + str(block[1]) + "\"", "already declared globally",
+                    "Please use changeValue instead")
+                raise(e)
+            if (block[1] in self.unknownVar):
+                self.unknownVar.remove(block[1])
+            self.loopFunctionStr += block[1] + " = "
+            if (not isinstance(block[5], basestring) and (
+                                            not isinstance(block[5], int))):
+                self.instructions[block[5][0]](block[5], "", localVar)
+            else:
+                self.loopFunctionStr += str(block[5])
             self.loopFunctionStr += ";\n"
-        else:
-            # print "c'est pas un bloc"
-            # print block[2]
-            self.loopFunctionStr += str(block[2]) + ";\n"
+        elif (block[2] == "local"):
+            if (block[1] in localVar):
+                e = Exception(
+                    "Warning setVar ambiguous : var",
+                    "\"" + str(block[1]) + "\"", "already declared locally")
+                raise(e)
+            else:
+                localVar.append(block[1])
+                self.loopFunctionStr += str(block[3]) + " " + str(block[4]) +\
+                    " " + str(block[1]) + " = "
+                if (not isinstance(block[5], basestring) and (
+                                            not isinstance(block[5], int))):
+                    self.instructions[block[5][0]](block[5], "", localVar)
+                    if "setVar:to:" in block[5][0]:
+                        localVar.append(block[5][1])
+                else:
+                    self.loopFunctionStr += str(block[5])
+                self.loopFunctionStr += ";\n"
+
+    def SetVar(self, block, i, localVar):
+        e = Exception(
+                "Warning do not use internal Scratch setVar.",
+                "Possibility of mis understood type")
+        raise(e)
+        # if (block[1] in localVar):
+        #    e = Exception(
+        #        "Warning setVar ambiguous : var",
+        #        "\"" + str(block[1]) + "\"", "already declared locally")
+        #    raise(e)
+        # elif (not (block[1] in self.var)):
+        #    localVar.append(block[1])
+        #    if isinstance(block[2], basestring):
+        #        if "." not in str(block[2]):
+        #            self.loopFunctionStr += i + "int " + block[1] + " = "
+        #        else:
+        #            self.loopFunctionStr += i + "float " + block[1] + " = "
+        #    elif isinstance(block[2], int):
+        #        self.loopFunctionStr += i + "int " + block[1] + " = "
+        # if (not isinstance(block[2], basestring) and (
+        #                                    not isinstance(block[2], int))):
+        #     print "c'est un bloc"
+        #     print block[2]
+        #    self.instructions[block[2][0]](block[2], "", localVar)
+        #    if "setVar:to:" in block[2][0]:
+        #            localVar.append(block[2][1])
+        #    self.loopFunctionStr += ";\n"
+        # else:
+        #     print "c'est pas un bloc"
+        #     print block[2]
+        #    self.loopFunctionStr += str(block[2]) + ";\n"
 
     def ChangeVar(self, block, i, localVar):
         # print block
         if (not (block[1] in localVar)) and (not (block[1] in self.var)):
-            self.var.append(block[1])
-            print "UVar = " + ', '.join(self.unknownVar)
-            if (block[1] in self.unknownVar):
-                self.unknownVar.remove(block[1])
-            if isinstance(block[2], basestring):
-                if "." not in str(block[2]):
-                    self.globalVarStr += "int " + block[1] + ";\n"
-                else:
-                    self.globalVarStr += "float " + block[1] + ";\n"
-            elif isinstance(block[2], int):
-                self.globalVarStr += "int " + block[1] + ";\n"
+            self.unknownVar.append(block[1])
+            # self.var.append(block[1])
+            # if (block[1] in self.unknownVar):
+            #    self.unknownVar.remove(block[1])
+            # if isinstance(block[2], basestring):
+            #    if "." not in str(block[2]):
+            #        self.globalVarStr += "int " + block[1] + ";\n"
+            #    else:
+            #        self.globalVarStr += "float " + block[1] + ";\n"
+            # elif isinstance(block[2], int):
+            #    self.globalVarStr += "int " + block[1] + ";\n"
+            # elif isinstance(block[2], float):
+            #    self.globalVarStr += "float " + block[1] + ";\n"
         self.loopFunctionStr += i + str(block[1])
         self.loopFunctionStr += " = "
 
         if (not isinstance(block[2], basestring) and (
-                                            not isinstance(block[2], int))):
+                                            not isinstance(block[2], int)) and(
+                                            not isinstance(block[2], float))):
             # print "c'est un bloc"
             # print block[2]
             self.instructions[block[2][0]](block[2], "", localVar)
-            if block[2][0] == "setVar:to:":
+            if "setVar:to:" in block[2][0]:
                     localVar.append(block[2][1])
             self.loopFunctionStr += ";\n"
         else:
@@ -446,7 +495,7 @@ class JsonInoConvertor(object):
             # print "c'est une instruction:"
             # print element
             self.instructions[block[1][0]](block[1], "", localVar)
-            if block[1][0] == "setVar:to:":
+            if "setVar:to:" in block[1][0]:
                     localVar.append(block[1][1])
         elif block[1][0] in self.booleanTests:
             # print "c'est un test booleen:"
@@ -462,7 +511,6 @@ class JsonInoConvertor(object):
         # print block
         if (not (block[1] in self.var) and (not (block[1] in localVar))):
             self.unknownVar.append(block[1])
-            print "UVarRead = " + ', '.join(self.unknownVar)
             # self.var.append(block[1])
             # self.globalVarStr += "int " + block[1] + "=0;\n"
 
@@ -553,13 +601,18 @@ class JsonInoConvertor(object):
                     afterGoBlock = threadScript[bl]
                     if afterGoBlock[0] != 'doForever' or (
                                             not afterGoBlock[0]):
-                        if afterGoBlock[0] == 'setVar:to:':
-                            self.instructions['setVar:to:'](
+                        if "setVar:to:" in afterGoBlock[0]:
+                            self.instructions[afterGoBlock[0]](
+                                afterGoBlock, self.indentation, localVar)
+                            localVar.append(afterGoBlock[1])
+                        elif 'changeVar:by:' in afterGoBlock[0]:
+                            self.instructions[afterGoBlock[0]](
                                 afterGoBlock, self.indentation, localVar)
                         else:
                             e = Exception(
                                 "Warning convertThreadScript : "
-                                "expected block doForever or setVar:to")
+                                "expected block doForever or variable\
+ set/change")
                             raise e
                     else:
                         print i
@@ -580,7 +633,7 @@ class JsonInoConvertor(object):
                 self.instructions[element[0]](element,
                                               i + self.indentation,
                                               localVar)
-                if element[0] == "setVar:to:":
+                if "setVar:to:" in element[0]:
                     localVar.append(element[1])
             elif element[0] in self.booleanTests:
                 # print "c'est un test booleen :"
