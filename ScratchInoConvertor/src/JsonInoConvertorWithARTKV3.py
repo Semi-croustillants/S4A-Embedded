@@ -21,6 +21,7 @@ class JsonInoConvertor(object):
     # nbBlockStr = str()
     pins = dict()
     var = []
+    unknownVar = []
     servohashlist = []
     indentation = str()
     incr = "j"
@@ -28,8 +29,23 @@ class JsonInoConvertor(object):
     sleep_var = False
 
     def __init__(self, indentation="   ", typeArduino=0):
-
         super(JsonInoConvertor, self).__init__()
+
+        self.instructions = dict()
+        self.booleanTests = dict()
+        self.globalVarStr = str()
+        self.setupFunctionStr = str()
+        self.loopFunctionStr = str()
+        self.functionNameStr = str()
+        self.nb_block = 0
+        self.pins = dict()
+        self.var = []
+        self.unknownVar = []
+        self.servohashlist = []
+        self.indentation = str()
+        self.incr = "j"
+        self.typeArduino = 0
+        self.sleep_var = False
 
         self.instructions = {
             'A4S (Arduino For Scratch).digitalWrite':
@@ -84,9 +100,6 @@ class JsonInoConvertor(object):
 
         self.indentation = indentation
         self.typeArduino = typeArduino
-
-    def __del__(self):
-        super(JsonInoConvertor, self).__del__()
 
     def doIfConvertion(self, block, i, localVar):
         self.loopFunctionStr += i + "if ( "
@@ -391,6 +404,9 @@ class JsonInoConvertor(object):
         # print block
         if (not (block[1] in localVar)) and (not (block[1] in self.var)):
             self.var.append(block[1])
+            print "UVar = " + ', '.join(self.unknownVar)
+            if (block[1] in self.unknownVar):
+                self.unknownVar.remove(block[1])
             if isinstance(block[2], basestring):
                 if "." not in str(block[2]):
                     self.globalVarStr += "int " + block[1] + ";\n"
@@ -445,8 +461,10 @@ class JsonInoConvertor(object):
     def doReadVariable(self, block, i, localVar):
         # print block
         if (not (block[1] in self.var) and (not (block[1] in localVar))):
-            self.var.append(block[1])
-            self.globalVarStr += "int " + block[1] + "=0;\n"
+            self.unknownVar.append(block[1])
+            print "UVarRead = " + ', '.join(self.unknownVar)
+            # self.var.append(block[1])
+            # self.globalVarStr += "int " + block[1] + "=0;\n"
 
         self.loopFunctionStr += i + block[1]
 
@@ -477,7 +495,12 @@ class JsonInoConvertor(object):
             for threadScript in data['children'][curs]['scripts']:
                 print threadScript[2]
                 self.convertThreadScript(threadScript[2], self.indentation, [])
-
+            if (self.unknownVar):
+                mess = "Error : Variable "
+                for uvar in self.unknownVar:
+                    mess += "\"" + str(uvar) + "\" "
+                mess += "read but never set"
+                raise(Exception(mess))
             self.setupFunctionStr += self.indentation + "ARTK_SetOptions("\
                 + str(self.typeArduino) + ") ;\n"
             for i in range(1, self.nb_block + 1):

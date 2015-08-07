@@ -165,7 +165,7 @@ class MainWindow(wx.Frame):
             self.label_3.SetLabel(fileName + " is parsed")
             try:
                 filePath = self.ArduinoSketchPath + os.sep +\
-                           fileName + os.sep + fileName + ".ino"
+                    fileName + os.sep + fileName + ".ino"
                 if sys.platform == "win32":
                     os.startfile(filePath)
                 else:
@@ -180,8 +180,9 @@ class MainWindow(wx.Frame):
             wx.MessageBox(error, 'Error',
                           wx.OK | wx.ICON_ERROR)
             self.label_3.SetLabel(fileName + " error parsing")
-
-        del convertor
+        finally:
+            del convertor
+            convertor = None
 
         # commande1 = "JsonInoConvertorWithARTKV3.py " + \
         #     self.file + " " + TypeArduino
