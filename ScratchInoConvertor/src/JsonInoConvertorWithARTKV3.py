@@ -404,7 +404,6 @@ class JsonInoConvertor(object):
         # print block
         if (not (block[1] in localVar)) and (not (block[1] in self.var)):
             self.var.append(block[1])
-            print "UVar = " + ', '.join(self.unknownVar)
             if (block[1] in self.unknownVar):
                 self.unknownVar.remove(block[1])
             if isinstance(block[2], basestring):
@@ -414,11 +413,14 @@ class JsonInoConvertor(object):
                     self.globalVarStr += "float " + block[1] + ";\n"
             elif isinstance(block[2], int):
                 self.globalVarStr += "int " + block[1] + ";\n"
+            elif isinstance(block[2], float):
+                self.globalVarStr += "float " + block[1] + ";\n"
         self.loopFunctionStr += i + str(block[1])
         self.loopFunctionStr += " = "
 
         if (not isinstance(block[2], basestring) and (
-                                            not isinstance(block[2], int))):
+                                            not isinstance(block[2], int)) and(
+                                            not isinstance(block[2], float))):
             # print "c'est un bloc"
             # print block[2]
             self.instructions[block[2][0]](block[2], "", localVar)
@@ -554,7 +556,11 @@ class JsonInoConvertor(object):
                     if afterGoBlock[0] != 'doForever' or (
                                             not afterGoBlock[0]):
                         if afterGoBlock[0] == 'setVar:to:':
-                            self.instructions['setVar:to:'](
+                            self.instructions[afterGoBlock[0]](
+                                afterGoBlock, self.indentation, localVar)
+                            localVar.append(afterGoBlock[1])
+                        elif afterGoBlock[0] == 'changeVar:by:':
+                            self.instructions[afterGoBlock[0]](
                                 afterGoBlock, self.indentation, localVar)
                         else:
                             e = Exception(
