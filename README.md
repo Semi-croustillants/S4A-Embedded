@@ -1,10 +1,15 @@
 # S4A embedded
-Allows embedding for scratch v2 programms on arduinos boards.
 
-Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S documentation](http://thomaspreece.com/resources.php)**). For tone and noTone
+Want to develop Arduino programs within scratch but also want to unplug it and plug it to any kind of power supply?
+
+Works with scratch v2 and SuperEasy-A4S blocks (**[see A4S documentation](http://thomaspreece.com/resources.php)**). For tone, noTone and servo blocks
 use ImportBlock.sb2 in github repository.
 
-Compiled with py2exe
+Windows stand alone executable compiled with py2exe.
+
+**Known Issues**:
+* **Problem parsing variables** : depending on which "_thread_" you created first and set your variables with, you might encounter some bugs during the translation into .ino file.
+* **Unix System** : you have to "hack" the path settings when you want to launch our system within a unix based OS. Some fixes to come
 
 **Needed**:
 
@@ -20,8 +25,8 @@ Compiled with py2exe
 * GUI
 * Translation : ".sb2" to customized ".ino"
 * Embedded kernel based on ARTK (thanks to **[P. H. Schimpf](https://sites.google.com/site/pschimpf99/home/artk)**)
-* A4S arduino blocks
-* Non slave/master system (sorry A4S, we rulez)
+* Custom A4S arduino blocks
+* Non slave/master system (sorry A4S and S4A, we rulez)
 * From 1 up to 5 threads
 
 # Getting Started
@@ -45,6 +50,8 @@ Compiled with py2exe
 
 
 ### Usage
+
+**COMING SOON : WINDOWS and UNIX usage
 * Import ARTK source code in librairies folder (Usually in Documents/Arduino)
 * Craft your own code in scratch v2 and circuit on your arduino
 * Export it as a .sb2 file
@@ -59,6 +66,11 @@ Compiled with py2exe
 ### Tests
 Tests data are available in exemple.sb2 and ImportBlocks.sb2 files
 
+### What\'s Next?
+* Working on a tutorial. Coming soon, the tutorial we presented during the Scratch AMS 2015 conv
+* Working on a way to compil and upload programs without oppening arduino's IDE.
+* Working on a way to use our system as an extension to add in scratch v2.
+
 ### Configuration file
 When you start the GUI for the first time, two dialogs appears.
 The first ask you to select the Arduino sketch folder and the
@@ -72,27 +84,6 @@ If you need to reinit configuration file, click on parameter menu and select
 "Reinit config file". This action will remove the obsolete .config file
 and ask you to select new informations
 
-# Translatable scratch v2 blocks
-* Arduino's blocks
-    * digitalWrite
-    * digitalRead
-    * analogRead
-    * analogWrite
-    * tone
-    * noTone
-    * servoWrite
-* Classics blocks
-    * doIf
-    * doIfElse
-    * readVariable
-    * setVar:to
-    * changeVar:by
-    * ops : *,+,-,/,%
-    * doRepeat
-    * doUntil
-    * wait:elapsed:from
-    * doWaitUntil
-    * boolean ops : &,=,|,<,>,not,low,high
-
 ### Context
 This tool has been developped by some french students in computer engineering school for a final project.
+
