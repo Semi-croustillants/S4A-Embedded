@@ -7,7 +7,7 @@ import sys
 import serial.tools.list_ports
 
 
-class AutoDetectSerial:
+class AutoDetectSerial(object):
 
     def __init__(self):
         pass
@@ -75,3 +75,7 @@ class AutoDetectSerial:
 if __name__ == '__main__':
     autoDetectSerial = AutoDetectSerial()
     print autoDetectSerial.getArduinosPath()
+
+    arduinoSerial = autoDetectSerial.getArduinosPath()
+    arduinoSerial = arduinoSerial[0]
+    print arduinoSerial[0], arduinoSerial[1]
