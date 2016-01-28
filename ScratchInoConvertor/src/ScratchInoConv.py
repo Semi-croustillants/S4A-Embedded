@@ -244,11 +244,9 @@ class MainWindow(wx.Frame):
 def download(url, dest):
     dlg = wx.ProgressDialog("Download Progress",
                             "Please wait...",
-                            style=wx.PD_CAN_ABORT
-                            | wx.PD_APP_MODAL
-                            | wx.PD_ELAPSED_TIME
-                            | wx.PD_ESTIMATED_TIME
-                            )
+                            style=wx.PD_CAN_ABORT |
+                            wx.PD_APP_MODAL |
+                            wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME)
     dlg.Update(0, "Please Wait...")
     fURL = urllib.urlopen(url)
     header = fURL.info()

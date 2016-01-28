@@ -166,8 +166,8 @@ class JsonInoConvertor(object):
 
         elif self.pins[pin] != 'OUTPUT':
             e = Exception(
-                "Warning digitalWriteConvertion : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning digitalWriteConvertion : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
 
         self.loopFunctionStr += i + "digitalWrite( " + str(pin) + ", "
@@ -186,8 +186,8 @@ class JsonInoConvertor(object):
 
         elif self.pins[pin] != 'OUTPUT':
             e = Exception(
-                "Warning tone : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning tone : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
         self.loopFunctionStr += i + "tone( " + str(pin) + ", "
         if isinstance(note, int) or isinstance(note, basestring):
@@ -208,8 +208,8 @@ class JsonInoConvertor(object):
 
         elif self.pins[pin] != 'OUTPUT':
             e = Exception(
-                "Warning notone : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning notone : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
 
         self.loopFunctionStr += i + "noTone( " + str(pin) + " );\n"
@@ -223,8 +223,8 @@ class JsonInoConvertor(object):
                 + "myservo" + str(pin) + ".attach(" + str(pin) + ");\n"
         elif self.pins[pin] != 'SERVO':
             e = Exception(
-                "Warning ServoWriteConvertion : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning ServoWriteConvertion : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
         self.loopFunctionStr += i + "myservo" + str(pin) + ".write( "
         if isinstance(block[2], int) or isinstance(block[2], basestring):
@@ -244,8 +244,8 @@ class JsonInoConvertor(object):
 
         elif self.pins[pin] != 'OUTPUT':
             e = Exception(
-                "Warning AnalogWriteConvertion : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning AnalogWriteConvertion : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
 
         self.loopFunctionStr += i + "AnalogWrite( " + str(pin) + ", "
@@ -281,8 +281,8 @@ class JsonInoConvertor(object):
 
         elif self.pins[pin] != 'INPUT':
             e = Exception(
-                "Warning reportDigitalReadingConvertion : pin"
-                + str(pin) + "already use in" + str(self.pins[pin]) + "status")
+                "Warning reportDigitalReadingConvertion : pin" + str(
+                    pin) + "already use in" + str(self.pins[pin]) + "status")
             raise(e)
         self.loopFunctionStr += "digitalRead( " + str(pin) + " )"
 
