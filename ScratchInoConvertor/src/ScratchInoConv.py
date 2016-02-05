@@ -18,6 +18,8 @@ import subprocess
 # begin wxGlade: extracode
 # end wxGlade
 import JsonInoConvertorWithARTKV3 as JsonInoConvertor
+import AutoDetectSerial as AutoDetectSerial
+import UploadArduino as UploadArduino
 
 
 class MainWindow(wx.Frame):
@@ -163,16 +165,38 @@ class MainWindow(wx.Frame):
                                            fileName + os.sep +
                                            fileName + ".ino")
             self.label_3.SetLabel(fileName + " is parsed")
-            try:
-                filePath = self.ArduinoSketchPath + os.sep +\
-                    fileName + os.sep + fileName + ".ino"
-                if sys.platform == "win32":
-                    os.startfile(filePath)
-                else:
-                    subprocess.call([self.ArduinoExecPath, filePath])
-            except:
-                wx.MessageBox("Can't open automatically .ino file.", 'Warning',
-                              wx.OK | wx.ICON_EXCLAMATION)
+
+
+            # call serial port detection
+            # then upload on the arduino card
+
+            autoDetectSerial = AutoDetectSerial.AutoDetectSerial()
+            arduinoSerial = autoDetectSerial.getArduinosPath()
+
+            if autoDetectSerial == []:
+                print "Error, no arduino board is connected"
+                sys.exit(1)
+
+            # take the first board connected
+            arduinoSerial = arduinoSerial[0]
+
+            filePath = self.ArduinoSketchPath + os.sep +\
+                fileName + os.sep + fileName + ".ino"
+
+            uploadArduino = UploadArduino.UploadArduino()
+            uploadArduino.upload(arduinoSerial[1], arduinoSerial[0], filePath)
+
+
+            # try:
+            #     filePath = self.ArduinoSketchPath + os.sep +\
+            #         fileName + os.sep + fileName + ".ino"
+            #     if sys.platform == "win32":
+            #         os.startfile(filePath)
+            #     else:
+            #         subprocess.call([self.ArduinoExecPath, filePath])
+            # except:
+            #     wx.MessageBox("Can't open automatically .ino file.", 'Warning',
+            #                   wx.OK | wx.ICON_EXCLAMATION)
         except Exception as expt:
             error = str()
             for mess in expt.args:
