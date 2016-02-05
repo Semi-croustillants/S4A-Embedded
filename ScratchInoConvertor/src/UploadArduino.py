@@ -13,14 +13,15 @@ import re
 # TODO add exception
 #   - user not in group tty… to upload to the board (Linux)
 #   - arduino UI not install
+
+
 class UploadArduino:
 
     def __init__(self):
         self.__arduinoType = {}
 
-        #TODO link every board name to package:arch:board
+        # TODO link every board name to package:arch:board
         # https://github.com/arduino/Arduino/blob/ide-1.5.x/build/shared/manpage.adoc
-
 
         self.__arduinoType["uno"] = "arduino:avr:uno"
 
@@ -53,20 +54,20 @@ class UploadArduino:
             print "Error, the Arduino board architecture is unknown"
             sys.exit(1)
 
-
         #
         # TODO manage sudo error:
         # can't open device "/dev/...": no such file or directory
         #
 
-        #arduino --board arduino:avr:uno --port /dev/ttyACM0  --upload /home/battosai/Arduino/buzzer/buzzer.ino
-        command = ['arduino', '--board', arduinoArch, '--port', serialPort, '--upload', arduinofile]
+        # arduino --board arduino:avr:uno --port /dev/ttyACM0
+        # --upload /home/battosai/Arduino/buzzer/buzzer.ino
+        command = ['arduino', '--board', arduinoArch, '--port',
+                   serialPort, '--upload', arduinofile]
 
         proc = subprocess.Popen(command, stdout=subprocess.PIPE)
         procStdout = proc.stdout.read()
 
         print procStdout
-
 
     def __uploadWindows(self, arduinoType, serialPort, arduinofile):
         pass
@@ -85,4 +86,5 @@ class UploadArduino:
 
 if __name__ == '__main__':
     uploadArduino = UploadArduino()
-    uploadArduino.upload("uno","/dev/ttyACM0","/home/battosai/Arduino/buzzer/buzzer.ino")
+    uploadArduino.upload("uno", "/dev/ttyACM0",
+                         "/home/battosai/Arduino/buzzer/buzzer.ino")

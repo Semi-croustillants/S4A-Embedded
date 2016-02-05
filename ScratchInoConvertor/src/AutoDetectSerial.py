@@ -37,7 +37,8 @@ class AutoDetectSerial(object):
         usbDevices = self.__getUsbDevicesLinux()
         arduinoDevices = []
         for usbDevice in usbDevices:
-            usbArduinoDevicesFound = re.findall('(\/dev\/.*) -(.*Arduino.*)', usbDevice)
+            usbArduinoDevicesFound = re.findall(
+                '(\/dev\/.*) -(.*Arduino.*)', usbDevice)
             if usbArduinoDevicesFound != []:
                 arduinoDevices.append(usbArduinoDevicesFound[0])
         return arduinoDevices
@@ -56,7 +57,6 @@ class AutoDetectSerial(object):
             if device[1].startswith("Arduino"):
                 arduinoDevices.append((device[0], device[1]))
         return arduinoDevices
-
 
     def getArduinosPath(self):
         '''

@@ -166,7 +166,6 @@ class MainWindow(wx.Frame):
                                            fileName + ".ino")
             self.label_3.SetLabel(fileName + " is parsed")
 
-
             # call serial port detection
             # then upload on the arduino card
 
@@ -186,7 +185,6 @@ class MainWindow(wx.Frame):
             uploadArduino = UploadArduino.UploadArduino()
             uploadArduino.upload(arduinoSerial[1], arduinoSerial[0], filePath)
 
-
             # try:
             #     filePath = self.ArduinoSketchPath + os.sep +\
             #         fileName + os.sep + fileName + ".ino"
@@ -195,7 +193,8 @@ class MainWindow(wx.Frame):
             #     else:
             #         subprocess.call([self.ArduinoExecPath, filePath])
             # except:
-            #     wx.MessageBox("Can't open automatically .ino file.", 'Warning',
+            #     wx.MessageBox(
+            #         "Can't open automatically .ino file.", 'Warning',
             #                   wx.OK | wx.ICON_EXCLAMATION)
         except Exception as expt:
             error = str()
@@ -206,7 +205,7 @@ class MainWindow(wx.Frame):
             self.label_3.SetLabel(fileName + " error parsing")
         finally:
             del convertor
-            convertor = None
+            # convertor = None
 
         # commande1 = "JsonInoConvertorWithARTKV3.py " + \
         #     self.file + " " + TypeArduino
