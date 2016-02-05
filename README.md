@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Semi-croustillants/S4A-Embedded.svg?branch=master)](https://travis-ci.org/Semi-croustillants/S4A-Embedded)
+[![Build Status](https://travis-ci.org/Semi-croustillants/S4A-Embedded.svg?branch=dev)](https://travis-ci.org/Semi-croustillants/S4A-Embedded)
 
 # S4A embedded
 
