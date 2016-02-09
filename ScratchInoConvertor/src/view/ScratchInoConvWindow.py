@@ -93,6 +93,7 @@ class ScratchInoConvWindow(wx.Frame):
             new_label_value = file_name + ' is charged   '
             self.__label_file_loaded.SetLabel(new_label_value)
         dlg.Destroy()
+        self.Layout()
 
     def __scratch_into_arduino(self, event):
         if self.__scratch_file is None:
@@ -105,10 +106,12 @@ class ScratchInoConvWindow(wx.Frame):
 
     # PATTERN OBSERVER
     def notify(self, err, error_msg=""):
+        print "here"
         if err:
-            self.__label_status_conv.SetLabel("Error: " + error_msg)
+            self.__label_status_conv.SetLabel(error_msg)
         else:
             self.__label_status_conv.SetLabel("Succeed")
+        self.Layout()
 
 if __name__ == "__main__":
     gettext.install("app")  # replace with the appropriate catalog name

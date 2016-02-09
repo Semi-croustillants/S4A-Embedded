@@ -35,6 +35,15 @@ class ScratchInoConv(object):
             raise ValueError("First argument must be object with notify method")
         self.observers.append(obs)
 
+    def __display_msg(self, err, object_error=None):
+        if self.__possessed_observers():
+            self.__notify_observers(err, ''.join(str(e1) for e1 in object_error.args))
+        else:
+            if err:
+                raise object_error
+            else:
+                print "Succeed"
+
     # CONV
     def scratch_into_arduino(self, scratch_file, arduino_type=0):
         try:
@@ -51,17 +60,10 @@ class ScratchInoConv(object):
             self.json_ino_convertor.convertSpriteScripts(scratch_file, arduino_ino_file_name)
             self.upload_arduino.upload(arduino_serial[1], arduino_serial[0], arduino_ino_file_name)
 
+            self.__display_msg(False)
         except AutoDetectSerialError, e:
-            if self.__possessed_observers():
-                self.__notify_observers(True, e.message)
-            else:
-                raise AutoDetectSerialError(True, e.message)
+            self.__display_msg(True, e)
         except UploadArduinoError, e:
-            if self.__possessed_observers():
-                self.__notify_observers(True, e.message)
-            else:
-                raise UploadArduinoError(True, e.message)
-        if self.__possessed_observers():
-            self.__notify_observers(False)
-        else:
-            print "Succeed"
+            self.__display_msg(True, e)
+        except Exception, e:
+            self.__display_msg(True, e)
