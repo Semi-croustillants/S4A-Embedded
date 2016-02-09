@@ -10,7 +10,6 @@ import controller.Controller as Controller
 
 
 class ScratchInoConvWindow(wx.Frame):
-
     def __init__(self, controller, *args, **kwds):
         if not isinstance(controller, Controller.Controller):
             raise ValueError("Error: a Controller object is expected")
@@ -20,60 +19,76 @@ class ScratchInoConvWindow(wx.Frame):
         self.__scratch_file = None
 
         # WX
-        kwds["style"] = (wx.MINIMIZE_BOX |
-                         wx.SYSTEM_MENU |
-                         wx.CLOSE_BOX |
-                         wx.CAPTION |
-                         wx.CLIP_CHILDREN)
-        wx.Frame.__init__(self, *args, **kwds)
+        # kwds["style"] = (wx.MINIMIZE_BOX |
+        #                  wx.SYSTEM_MENU |
+        #                  wx.CLOSE_BOX |
+        #                  wx.CAPTION |
+        #                  wx.CLIP_CHILDREN)
+        wx.Frame.__init__(self,
+                          None,
+                          -1,
+                          "ScratchV2 To Ino",
+                          style=wx.MINIMIZE_BOX | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN)
+
         wx.Frame.SetIcon(self,
                          wx.Icon("view/res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
 
-        self.SetTitle(("ScratchV2 To Ino"))
+        # self.SetTitle(("ScratchV2 To Ino"))
         self.__set_layout()
 
     def __set_layout(self):
         # main container
         frame_sizer = wx.BoxSizer(wx.VERTICAL)
-        grid_sizer = wx.FlexGridSizer(5, 1, 1, 1)
+
+        # panel
+        bag_sizer = wx.GridBagSizer(hgap=5, vgap=5)
 
         # label
-        self.__label_file_loaded = wx.StaticText(self, wx.ID_ANY, (u"No file loaded"))
-        self.__label_status_conv = wx.StaticText(self, wx.ID_ANY, (u"No file sent"))
+        label_scratch_file = wx.StaticText(self, wx.ID_ANY, (u"Scratch File:"), size=(100, 30))
+        label_board_type = wx.StaticText(self, wx.ID_ANY, (u"Board Type:"), size=(100, 30))
+        label_status = wx.StaticText(self, wx.ID_ANY, (u"Status:"), size=(100, 30))
+        label_status_msg = wx.StaticText(self, wx.ID_ANY, (u"Not Started Yet"), size=(100, 30))
+        # label_serial_port = wx.StaticText(self, wx.ID_ANY, (u"Serial Port:"))
 
         # button
-        bitmap_button_launch_conv = wx.BitmapButton(self, wx.ID_ANY, wx.Bitmap("view/res/go.png"))
+        button_browse_scratch_file = wx.Button(self, 1, "Browse", size=(100, 30))
+        # button_refresh_port = wx.Button(self, 2, "Refresh")
+        button_start_upload = wx.Button(self, 3, "Start Upload", size=(-1, 30))
 
-        bitmap_button_load_file = wx.BitmapButton(self, wx.ID_ANY, wx.Bitmap("view/res/load_local.png"))
-        bitmap_button_load_file.SetMinSize((240, 240))
+        # input text
+        # console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE)
+        text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30))
 
-        # button event
-        self.Bind(wx.EVT_BUTTON, self.__choose_file, bitmap_button_load_file)
-        self.Bind(wx.EVT_BUTTON, self.__scratch_into_arduino, bitmap_button_launch_conv)
-
-        # radio button
-        self.__radio_box_arduino_type = wx.RadioBox(
-            self, wx.ID_ANY,
-            ("Arduino type"),
-            choices=[("Uno"), ("Other")],
-            majorDimension=2,
-            style=wx.RA_SPECIFY_ROWS)
-        self.__radio_box_arduino_type.SetSelection(0)
-
-        # radio button event
-        self.Bind(wx.EVT_BUTTON, self.__set_arduino_type, self.__radio_box_arduino_type)
+        # Choice
+        choice_board_type = wx.ListBox(self, wx.ID_ANY, size=(-1, 30), choices=[])
+        # list_box_serial_port = wx.ListBox(self, wx.ID_ANY, [], wx.LB_SINGLE)
 
         # add to container
-        grid_sizer.Add(bitmap_button_load_file, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
-        grid_sizer.Add(self.__label_file_loaded, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
-        grid_sizer.Add(self.__radio_box_arduino_type, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
-        grid_sizer.Add(bitmap_button_launch_conv, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
-        grid_sizer.Add(self.__label_status_conv, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 15)
+        bag_sizer.Add(label_scratch_file, pos=(0, 0))
+        bag_sizer.Add(text_scratch_file, pos=(0, 1), flag=wx.EXPAND)
+        bag_sizer.Add(button_browse_scratch_file, pos=(0, 2))
 
-        frame_sizer.Add(grid_sizer, proportion=1, flag=wx.ALL | wx.ALIGN_CENTER_HORIZONTAL)
+        bag_sizer.Add(label_board_type, pos=(1, 0))
+        bag_sizer.Add(choice_board_type, pos=(1, 1), span=(1, 2), flag=wx.EXPAND)
+
+        bag_sizer.Add(label_status, pos=(2, 0))
+        bag_sizer.Add(label_status_msg, pos=(2, 1), span=(1, 2), flag=wx.EXPAND)
+
+        # bag_sizer.AddGrowableCol(2, 0)
+        bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 5), flag=wx.EXPAND)
+
+        # console_panel.Add(console, 0,  wx.ALL | wx.EXPAND, 10)
+
+        # grow able cells
+        # bag_sizer.AddGrowableCol(0, 1)
+        bag_sizer.AddGrowableCol(1)
+
+        frame_sizer.Add(bag_sizer, 0, wx.EXPAND)
+
         self.SetSizer(frame_sizer)
         frame_sizer.SetSizeHints(self)
         self.SetSize((400, 150))
+        self.Fit()
 
     # EVENT FUNCTION
     def __set_arduino_type(self, event):
@@ -112,6 +127,7 @@ class ScratchInoConvWindow(wx.Frame):
         else:
             self.__label_status_conv.SetLabel("Succeed")
         self.Layout()
+
 
 if __name__ == "__main__":
     gettext.install("app")  # replace with the appropriate catalog name
