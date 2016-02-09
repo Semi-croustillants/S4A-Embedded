@@ -456,7 +456,7 @@ class JsonInoConvertor(object):
             self.booleanTests[block[1][0]](block[1], localVar)
         else:
             e = Exception(
-                "Warning script : bloc", block[1][0], "non géré...")
+                "Warning script : bloc", block[1][0], "not supported...")
             raise(e)
         self.loopFunctionStr += ")"
 
@@ -594,5 +594,5 @@ class JsonInoConvertor(object):
                 self.booleanTests[element[0]](element, localVar)
             else:
                 e = Exception(
-                    "Warning script : bloc", element[0], "non géré...")
+                    "Warning script : bloc", element[0], " not supported...")
                 raise(e)
