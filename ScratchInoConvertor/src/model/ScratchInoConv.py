@@ -37,7 +37,10 @@ class ScratchInoConv(object):
 
     def __display_msg(self, err, object_error=None):
         if self.__possessed_observers():
-            self.__notify_observers(err, ''.join(str(e1) for e1 in object_error.args))
+            if err:
+                self.__notify_observers(err, ''.join(str(e1) for e1 in object_error.args))
+            else:
+                self.__notify_observers(True, "Succeed")
         else:
             if err:
                 raise object_error

@@ -42,12 +42,13 @@ class ScratchInoConvWindow(wx.Frame):
 
         # panel
         bag_sizer = wx.GridBagSizer(hgap=5, vgap=5)
+        console_panel = wx.BoxSizer(wx.VERTICAL)
 
         # label
         label_scratch_file = wx.StaticText(self, wx.ID_ANY, (u"Scratch File:"), size=(100, 30))
         label_board_type = wx.StaticText(self, wx.ID_ANY, (u"Board Type:"), size=(100, 30))
         label_status = wx.StaticText(self, wx.ID_ANY, (u"Status:"), size=(100, 30))
-        label_status_msg = wx.StaticText(self, wx.ID_ANY, (u"Not Started Yet"), size=(100, 30))
+        self.__label_status_msg = wx.StaticText(self, wx.ID_ANY, (u"Not Started Yet"), size=(100, 30))
         # label_serial_port = wx.StaticText(self, wx.ID_ANY, (u"Serial Port:"))
 
         # button
@@ -55,35 +56,43 @@ class ScratchInoConvWindow(wx.Frame):
         # button_refresh_port = wx.Button(self, 2, "Refresh")
         button_start_upload = wx.Button(self, 3, "Start Upload", size=(-1, 30))
 
+        # button event
+        button_browse_scratch_file.Bind(wx.EVT_BUTTON, self.__choose_file)
+        button_start_upload.Bind(wx.EVT_BUTTON, self.__scratch_into_arduino)
+
         # input text
-        # console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE)
-        text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30))
+        console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.__text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30), style=wx.TE_READONLY)
 
         # Choice
         choice_board_type = wx.ListBox(self, wx.ID_ANY, size=(-1, 30), choices=[])
         # list_box_serial_port = wx.ListBox(self, wx.ID_ANY, [], wx.LB_SINGLE)
 
         # add to container
+        # line 1
         bag_sizer.Add(label_scratch_file, pos=(0, 0))
-        bag_sizer.Add(text_scratch_file, pos=(0, 1), flag=wx.EXPAND)
+        bag_sizer.Add(self.__text_scratch_file, pos=(0, 1), flag=wx.EXPAND)
         bag_sizer.Add(button_browse_scratch_file, pos=(0, 2))
 
+        # line 2
         bag_sizer.Add(label_board_type, pos=(1, 0))
         bag_sizer.Add(choice_board_type, pos=(1, 1), span=(1, 2), flag=wx.EXPAND)
 
+        # line 3
         bag_sizer.Add(label_status, pos=(2, 0))
-        bag_sizer.Add(label_status_msg, pos=(2, 1), span=(1, 2), flag=wx.EXPAND)
+        bag_sizer.Add(self.__label_status_msg, pos=(2, 1), span=(1, 2), flag=wx.EXPAND)
 
-        # bag_sizer.AddGrowableCol(2, 0)
-        bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 5), flag=wx.EXPAND)
+        # line 4
+        bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 3), flag=wx.EXPAND)
 
-        # console_panel.Add(console, 0,  wx.ALL | wx.EXPAND, 10)
+        # line 5
+        console_panel.Add(console, 1, wx.EXPAND)
 
-        # grow able cells
-        # bag_sizer.AddGrowableCol(0, 1)
+        # grow able col
         bag_sizer.AddGrowableCol(1)
 
         frame_sizer.Add(bag_sizer, 0, wx.EXPAND)
+        frame_sizer.Add(console_panel, 1, wx.EXPAND)
 
         self.SetSizer(frame_sizer)
         frame_sizer.SetSizeHints(self)
@@ -106,7 +115,7 @@ class ScratchInoConvWindow(wx.Frame):
 
             self.__scratch_file = folder_name + os.sep + file_name
             new_label_value = file_name + ' is charged   '
-            self.__label_file_loaded.SetLabel(new_label_value)
+            self.__text_scratch_file.SetValue(path)
         dlg.Destroy()
         self.Layout()
 
@@ -116,16 +125,16 @@ class ScratchInoConvWindow(wx.Frame):
                           wx.OK | wx.ICON_ERROR)
 
         else:
-            arduino_type = 1 if self.__radio_box_arduino_type.GetStringSelection() == "Other" else 0
-            self.controller.scratch_into_arduino(self.__scratch_file, arduino_type)
+            # arduino_type = 1 if self.__radio_box_arduino_type.GetStringSelection() == "Other" else 0
+            self.controller.scratch_into_arduino(self.__scratch_file, 0)
 
     # PATTERN OBSERVER
     def notify(self, err, error_msg=""):
         print "here"
         if err:
-            self.__label_status_conv.SetLabel(error_msg)
+            self.__label_status_msg.SetLabel(error_msg)
         else:
-            self.__label_status_conv.SetLabel("Succeed")
+            self.__label_status_msg.SetLabel("Succeed")
         self.Layout()
 
 
