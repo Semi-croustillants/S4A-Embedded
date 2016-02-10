@@ -13,6 +13,8 @@ from re import search
 #   - user not in group tty… to upload to the board (_linux)
 import serial
 
+from model.Message import Message
+
 
 class UploadArduinoError(Exception):
     pass
@@ -78,7 +80,7 @@ class UploadArduino:
 
         raise UploadArduinoError("Error: the Arduino board architecture is unknown, please contact us to support it")
 
-    def upload(self, arduino_type, serial_port, arduinofile):
+    def upload(self, arduino_type, serial_port, arduinofile, callback_log=None):
         """
         upload an arduino code to the arduino board
         :param arduino_type: the arduino model: uno, mega…
@@ -115,10 +117,20 @@ class UploadArduino:
                    serial_port, '--upload', arduinofile]
 
         # execute and display
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-        proc_stdout = proc.stdout.read()
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # proc_stdout = proc.stdout.read()
 
-        print proc_stdout
+        for line in iter(proc.stderr.readline, b''):
+            if callback_log is None:
+                print line
+            else:
+                callback_log(Message(Message.CONSOLE_LOG_ERR, line))
+
+        for line in iter(proc.stdout.readline, b''):
+            if callback_log is None:
+                print line
+            else:
+                callback_log(Message(Message.CONSOLE_LOG, line))
 
 if __name__ == '__main__':
     upload_arduino = UploadArduino()

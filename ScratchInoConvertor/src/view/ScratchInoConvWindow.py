@@ -7,6 +7,7 @@ import os
 import wx
 import gettext
 import controller.Controller as Controller
+from model.Message import Message
 
 
 class ScratchInoConvWindow(wx.Frame):
@@ -61,11 +62,13 @@ class ScratchInoConvWindow(wx.Frame):
         button_start_upload.Bind(wx.EVT_BUTTON, self.__scratch_into_arduino)
 
         # input text
-        console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.__console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
         self.__text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30), style=wx.TE_READONLY)
 
+        self.__console.SetLabel("nrstrns")
+
         # Choice
-        choice_board_type = wx.ListBox(self, wx.ID_ANY, size=(-1, 30), choices=[])
+        self.__choice_board_type = wx.ComboBox(self, wx.ID_ANY, size=(-1, 30), choices=["Uno", "Others"])
         # list_box_serial_port = wx.ListBox(self, wx.ID_ANY, [], wx.LB_SINGLE)
 
         # add to container
@@ -76,7 +79,7 @@ class ScratchInoConvWindow(wx.Frame):
 
         # line 2
         bag_sizer.Add(label_board_type, pos=(1, 0))
-        bag_sizer.Add(choice_board_type, pos=(1, 1), span=(1, 2), flag=wx.EXPAND)
+        bag_sizer.Add(self.__choice_board_type, pos=(1, 1), span=(1, 2), flag=wx.EXPAND)
 
         # line 3
         bag_sizer.Add(label_status, pos=(2, 0))
@@ -86,7 +89,7 @@ class ScratchInoConvWindow(wx.Frame):
         bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 3), flag=wx.EXPAND)
 
         # line 5
-        console_panel.Add(console, 1, wx.EXPAND)
+        console_panel.Add(self.__console, 1, wx.EXPAND)
 
         # grow able col
         bag_sizer.AddGrowableCol(1)
@@ -100,10 +103,6 @@ class ScratchInoConvWindow(wx.Frame):
         self.Fit()
 
     # EVENT FUNCTION
-    def __set_arduino_type(self, event):
-        self.__radio_box_arduino_type.GetStringSelection()
-        event.Skip()
-
     def __choose_file(self, event):
         dlg = wx.FileDialog(
             self, "Open ScratchV2 project", os.getcwd(), "", "*.sb2", wx.OPEN)
@@ -114,7 +113,6 @@ class ScratchInoConvWindow(wx.Frame):
             folder_name = dlg.GetDirectory()
 
             self.__scratch_file = folder_name + os.sep + file_name
-            new_label_value = file_name + ' is charged   '
             self.__text_scratch_file.SetValue(path)
         dlg.Destroy()
         self.Layout()
@@ -125,16 +123,33 @@ class ScratchInoConvWindow(wx.Frame):
                           wx.OK | wx.ICON_ERROR)
 
         else:
-            # arduino_type = 1 if self.__radio_box_arduino_type.GetStringSelection() == "Other" else 0
-            self.controller.scratch_into_arduino(self.__scratch_file, 0)
+            self.__label_status_msg.SetLabel("In Progress...")
+            self.__console.AppendText("\n=========== START UPLOAD ===========\n")
+            self.controller.scratch_into_arduino(self.__scratch_file, self.__choice_board_type.GetCurrentSelection())
 
     # PATTERN OBSERVER
-    def notify(self, err, error_msg=""):
-        print "here"
-        if err:
-            self.__label_status_msg.SetLabel(error_msg)
-        else:
+    def notify(self, message):
+        if not isinstance(message, Message):
+            raise ValueError("Error: a Message object is expected")
+
+        if message.code == Message.SUCCEED_MESSAGE:
+            self.__label_status_msg.SetForegroundColour(wx.GREEN)
             self.__label_status_msg.SetLabel("Succeed")
+        elif message.code == Message.ERROR_MESSAGE:
+            self.__label_status_msg.SetForegroundColour(wx.RED)
+            self.__label_status_msg.SetLabel("Error")
+
+            self.__console.SetForegroundColour(wx.RED)
+            self.__console.AppendText(message.message)
+            self.__console.SetForegroundColour(wx.WHITE)
+
+        elif message.code == Message.CONSOLE_LOG:
+            self.__console.AppendText(message.message)
+        elif message.code == Message.CONSOLE_LOG_ERR:
+            self.__console.SetForegroundColour(wx.RED)
+            self.__console.AppendText(message.message)
+            self.__console.SetForegroundColour(wx.WHITE)
+
         self.Layout()
 
 
