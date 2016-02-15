@@ -4,8 +4,11 @@
 from __future__ import unicode_literals
 
 import os
+
+import sys
 import wx
 import gettext
+from threading import Thread
 import controller.Controller as Controller
 from model.Message import Message
 
@@ -20,21 +23,13 @@ class ScratchInoConvWindow(wx.Frame):
         self.__scratch_file = None
 
         # WX
-        # kwds["style"] = (wx.MINIMIZE_BOX |
-        #                  wx.SYSTEM_MENU |
-        #                  wx.CLOSE_BOX |
-        #                  wx.CAPTION |
-        #                  wx.CLIP_CHILDREN)
         wx.Frame.__init__(self,
                           None,
                           -1,
                           "ScratchV2 To Ino",
                           style=wx.MINIMIZE_BOX | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN)
 
-        wx.Frame.SetIcon(self,
-                         wx.Icon("view/res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
-
-        # self.SetTitle(("ScratchV2 To Ino"))
+        wx.Frame.SetIcon(self, wx.Icon("view/res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
         self.__set_layout()
 
     def __set_layout(self):
@@ -65,10 +60,12 @@ class ScratchInoConvWindow(wx.Frame):
         self.__console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
         self.__text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30), style=wx.TE_READONLY)
 
-        self.__console.SetLabel("nrstrns")
+        # sys.stderr = self.__console
+        sys.stdout = self.__console
 
         # Choice
-        self.__choice_board_type = wx.ComboBox(self, wx.ID_ANY, size=(-1, 30), choices=["Uno", "Others"])
+        self.__choice_board_type = wx.ComboBox(self, wx.ID_ANY, size=(-1, 30),
+                                               choices=["Uno", "Others"], style=wx.TE_READONLY)
         # list_box_serial_port = wx.ListBox(self, wx.ID_ANY, [], wx.LB_SINGLE)
 
         # add to container
@@ -102,22 +99,49 @@ class ScratchInoConvWindow(wx.Frame):
         self.SetSize((400, 150))
         self.Fit()
 
+    def __write_in_console(self, code, message):
+        """
+        write a message in the console
+        :param code: Message.CONSOLE_LOG => white | Message.CONSOLE_LOG_ERR => red
+        :param message:
+        :return:
+        """
+        self.__console.SetForegroundColour(wx.WHITE)
+        if code == Message.CONSOLE_LOG:
+            self.__console.AppendText(message)
+        elif code == Message.CONSOLE_LOG_ERR:
+            self.__console.SetForegroundColour(wx.RED)
+            self.__console.AppendText(message)
+
     # EVENT FUNCTION
     def __choose_file(self, event):
-        dlg = wx.FileDialog(
-            self, "Open ScratchV2 project", os.getcwd(), "", "*.sb2", wx.OPEN)
+        """
+        allow user to choose a scratch file
+        :param event:
+        :return:
+        """
+
+        # choose the file
+        dlg = wx.FileDialog(self, "Open ScratchV2 project", os.getcwd(), "", "*.sb2", wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
+            # get the path
             path = dlg.GetPath()
-            file_name = os.path.basename(path)
-            folder_name = dlg.GetDirectory()
+            self.__scratch_file = path
 
-            self.__scratch_file = folder_name + os.sep + file_name
+            # display it
             self.__text_scratch_file.SetValue(path)
         dlg.Destroy()
+
+        # refresh the view
         self.Layout()
 
     def __scratch_into_arduino(self, event):
+        """
+        launch the upload
+        :param event:
+        :return:
+        """
         if self.__scratch_file is None:
             wx.MessageBox("Please set a file", 'Error',
                           wx.OK | wx.ICON_ERROR)
@@ -125,10 +149,17 @@ class ScratchInoConvWindow(wx.Frame):
         else:
             self.__label_status_msg.SetLabel("In Progress...")
             self.__console.AppendText("\n=========== START UPLOAD ===========\n")
-            self.controller.scratch_into_arduino(self.__scratch_file, self.__choice_board_type.GetCurrentSelection())
+            Thread(target=self.controller.scratch_into_arduino(self.__scratch_file,
+                                                               self.__choice_board_type.GetCurrentSelection())).start()
 
     # PATTERN OBSERVER
     def notify(self, message):
+        """
+        receive a notification from the observable object
+        :param message: Message(code, Message), see Message class
+        :return:
+        """
+
         if not isinstance(message, Message):
             raise ValueError("Error: a Message object is expected")
 
@@ -138,17 +169,13 @@ class ScratchInoConvWindow(wx.Frame):
         elif message.code == Message.ERROR_MESSAGE:
             self.__label_status_msg.SetForegroundColour(wx.RED)
             self.__label_status_msg.SetLabel("Error")
-
-            self.__console.SetForegroundColour(wx.RED)
-            self.__console.AppendText(message.message)
-            self.__console.SetForegroundColour(wx.WHITE)
+            self.__write_in_console(message.code, message.message)
 
         elif message.code == Message.CONSOLE_LOG:
-            self.__console.AppendText(message.message)
+            self.__write_in_console(message.code, message.message)
+
         elif message.code == Message.CONSOLE_LOG_ERR:
-            self.__console.SetForegroundColour(wx.RED)
-            self.__console.AppendText(message.message)
-            self.__console.SetForegroundColour(wx.WHITE)
+            self.__write_in_console(message.code, message.message)
 
         self.Layout()
 
