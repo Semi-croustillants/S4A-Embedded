@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
 import gettext
@@ -20,6 +20,8 @@ def display_help():
     print "      -h,   --help       display this help"
 
 if __name__ == "__main__":
+    for arg in sys.argv:
+        print arg
     if len(sys.argv) > 1:
         if sys.argv[1] == "--UI":
             # scratch_ino_conv = ScratchInoConv.ScratchInoConv()
@@ -47,10 +49,10 @@ if __name__ == "__main__":
             if len(sys.argv) == 4:
                 arduino_type = sys.argv[3]
 
-            if len(sys.argv) < 3:
+            if len(sys.argv) < 4:
                 raise ValueError("Error: not enough argument")
 
-            if len(sys.argv) > 4:
+            if len(sys.argv) > 5:
                 raise ValueError("Error: too many arguments")
             scratch_ino_conv = ScratchInoConv.ScratchInoConv()
             scratch_ino_conv.scratch_into_arduino(scratch_file, arduino_type)

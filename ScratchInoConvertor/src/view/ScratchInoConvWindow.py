@@ -1,5 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python2.7
+#  -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
 
@@ -109,9 +109,10 @@ class ScratchInoConvWindow(wx.Frame):
         self.__console.SetForegroundColour(wx.WHITE)
         if code == Message.CONSOLE_LOG:
             self.__console.AppendText(message)
-        elif code == Message.CONSOLE_LOG_ERR:
+        elif code == Message.CONSOLE_LOG_ERR or code == Message.ERROR_MESSAGE:
             self.__console.SetForegroundColour(wx.RED)
             self.__console.AppendText(message)
+        self.__console.SetForegroundColour(wx.WHITE)
 
     # EVENT FUNCTION
     def __choose_file(self, event):

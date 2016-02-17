@@ -137,9 +137,9 @@ class UploadArduino(threading.Thread):
         lines = ""
         for line in iter(proc.stderr.readline, b''):
             lines = lines + line
-        print lines
+        # print lines
 
-        lines = ""
+        # lines = ""
         for line in iter(proc.stdout.readline, b''):
             lines = lines + line
         print lines
