@@ -55,7 +55,7 @@ class UploadArduino(threading.Thread):
             sub.terminate()
             null.close()
         except OSError:
-            raise UploadArduinoError("Error: Arduino UI is not installed, please install it")
+            self.__display_error("Error: Arduino UI is not installed, please install it")
 
     def __arduino_ui_get_path_windows(self):
         """
@@ -78,7 +78,7 @@ class UploadArduino(threading.Thread):
                 a_key = _winreg.OpenKey(a_reg, r"Software\\Arduino")
                 val = _winreg.QueryValueEx(a_key, "Install_Dir")[0]
             except WindowsError:
-                raise UploadArduinoError("Error: Arduino UI is not installed, please install it")
+                self.__display_error("Error: Arduino UI is not installed, please install it")
         return val + "\\arduino.exe"
 
     def __get_arduino_arch_board(self, arduino_type):
@@ -94,7 +94,14 @@ class UploadArduino(threading.Thread):
             if arduino_arch:
                 return self.__arduino_type_list[key]
 
-        raise UploadArduinoError("Error: the Arduino board architecture is unknown, please contact us to support it")
+        self.__display_error("Error: the Arduino board architecture is unknown, please contact us to support it")
+
+    def __display_error(self, error):
+        if self.__callback_log is not None:
+            # self.__callback_log(Message(Message.ERROR_MESSAGE, error))
+            print "ERROR: " + error
+        else:
+            raise UploadArduinoError(error)
 
     def run(self):
         """
@@ -111,7 +118,7 @@ class UploadArduino(threading.Thread):
             arduino_exe = "arduino"
 
         else:
-            raise UploadArduinoError("Error: unsupported OS")
+            self.__display_error("Error: unsupported OS")
 
         # test if the file exist
         if not os.path.isfile(self.__arduino_file):
@@ -122,8 +129,11 @@ class UploadArduino(threading.Thread):
 
         # test if serial is reachable
         # exception is thrown else
-        ser = serial.Serial(self.__serial_port, 4600, timeout=1)
-        ser.close()
+        try:
+            ser = serial.Serial(self.__serial_port, 4600, timeout=1)
+            ser.close()
+        except serial.SerialException, e:
+            self.__display_error("could not open port " + self.__serial_port + " verify your permission")
 
         # prepare the command
         command = [arduino_exe, '--board', arduino_arch, '--port',

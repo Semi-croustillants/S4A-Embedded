@@ -3,7 +3,7 @@
 
 import os
 
-from gst._gst import Message
+import serial
 
 from model import JsonInoConvertorWithARTKV3 as JsonInoConvertor, UploadArduino, AutoDetectSerial, Message
 from AutoDetectSerial import AutoDetectSerialError
@@ -104,6 +104,8 @@ class ScratchInoConv(object):
         except AutoDetectSerialError, e:
             self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
         except UploadArduinoError, e:
+            self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
+        except serial.SerialException, e:
             self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
         except Exception, e:
             self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
