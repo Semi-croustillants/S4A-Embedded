@@ -23,13 +23,16 @@ class ScratchInoConvWindow(wx.Frame):
         self.__scratch_file = None
 
         # WX
-        wx.Frame.__init__(self,
-                          None,
-                          -1,
-                          "ScratchV2 To Ino",
-                          style=wx.MINIMIZE_BOX | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN)
+        wx.Frame.__init__(
+            self,
+            None,
+            -1,
+            "ScratchV2 To Ino",
+            style=wx.MINIMIZE_BOX | wx.SYSTEM_MENU |
+            wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN)
 
-        wx.Frame.SetIcon(self, wx.Icon("view/res/icon.png", wx.BITMAP_TYPE_PNG, 96, 96))
+        wx.Frame.SetIcon(self, wx.Icon("view/res/icon.png", wx.BITMAP_TYPE_PNG,
+                                       96, 96))
         self.__set_layout()
 
     def __set_layout(self):
@@ -41,14 +44,20 @@ class ScratchInoConvWindow(wx.Frame):
         console_panel = wx.BoxSizer(wx.VERTICAL)
 
         # label
-        label_scratch_file = wx.StaticText(self, wx.ID_ANY, (u"Scratch File:"), size=(100, 30))
-        label_board_type = wx.StaticText(self, wx.ID_ANY, (u"Board Type:"), size=(100, 30))
-        label_status = wx.StaticText(self, wx.ID_ANY, (u"Status:"), size=(100, 30))
-        self.__label_status_msg = wx.StaticText(self, wx.ID_ANY, (u"Not Started Yet"), size=(100, 30))
+        label_scratch_file = wx.StaticText(self, wx.ID_ANY, (u"Scratch File:"),
+                                           size=(100, 30))
+        label_board_type = wx.StaticText(self, wx.ID_ANY, (u"Board Type:"),
+                                         size=(100, 30))
+        label_status = wx.StaticText(self, wx.ID_ANY, (u"Status:"), size=(100,
+                                                                          30))
+        self.__label_status_msg = wx.StaticText(self, wx.ID_ANY,
+                                                (u"Not Started Yet"),
+                                                size=(100, 30))
         # label_serial_port = wx.StaticText(self, wx.ID_ANY, (u"Serial Port:"))
 
         # button
-        button_browse_scratch_file = wx.Button(self, 1, "Browse", size=(100, 30))
+        button_browse_scratch_file = wx.Button(self, 1, "Browse",
+                                               size=(100, 30))
         # button_refresh_port = wx.Button(self, 2, "Refresh")
         button_start_upload = wx.Button(self, 3, "Start Upload", size=(-1, 30))
 
@@ -57,15 +66,20 @@ class ScratchInoConvWindow(wx.Frame):
         button_start_upload.Bind(wx.EVT_BUTTON, self.__scratch_into_arduino)
 
         # input text
-        self.__console = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
-        self.__text_scratch_file = wx.TextCtrl(self, wx.ID_ANY, "", size=(-1, 30), style=wx.TE_READONLY)
+        self.__console = wx.TextCtrl(
+            self, wx.ID_ANY, "",
+            style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH)
+        self.__text_scratch_file = wx.TextCtrl(
+            self, wx.ID_ANY,
+            "", size=(-1, 30), style=wx.TE_READONLY)
 
         # sys.stderr = self.__console
         sys.stdout = self.__console
 
         # Choice
-        self.__choice_board_type = wx.ComboBox(self, wx.ID_ANY, size=(-1, 30),
-                                               choices=["Uno", "Others"], style=wx.TE_READONLY)
+        self.__choice_board_type = wx.ComboBox(
+            self, wx.ID_ANY, size=(-1, 30),
+            choices=["Uno", "Others"], style=wx.TE_READONLY)
         # list_box_serial_port = wx.ListBox(self, wx.ID_ANY, [], wx.LB_SINGLE)
 
         # add to container
@@ -76,14 +90,17 @@ class ScratchInoConvWindow(wx.Frame):
 
         # line 2
         bag_sizer.Add(label_board_type, pos=(1, 0))
-        bag_sizer.Add(self.__choice_board_type, pos=(1, 1), span=(1, 2), flag=wx.EXPAND)
+        bag_sizer.Add(self.__choice_board_type, pos=(1, 1), span=(1, 2),
+                      flag=wx.EXPAND)
 
         # line 3
         bag_sizer.Add(label_status, pos=(2, 0))
-        bag_sizer.Add(self.__label_status_msg, pos=(2, 1), span=(1, 2), flag=wx.EXPAND)
+        bag_sizer.Add(self.__label_status_msg, pos=(2, 1), span=(1, 2),
+                      flag=wx.EXPAND)
 
         # line 4
-        bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 3), flag=wx.EXPAND)
+        bag_sizer.Add(button_start_upload, pos=(3, 0), span=(1, 3),
+                      flag=wx.EXPAND)
 
         # line 5
         console_panel.Add(self.__console, 1, wx.EXPAND)
@@ -102,7 +119,7 @@ class ScratchInoConvWindow(wx.Frame):
     def __write_in_console(self, code, message):
         """
         write a message in the console
-        :param code: Message.CONSOLE_LOG => white | Message.CONSOLE_LOG_ERR => red
+        :param code: Message.CONSOLE_LOG =>white|Message.CONSOLE_LOG_ERR => red
         :param message:
         :return:
         """
@@ -123,7 +140,8 @@ class ScratchInoConvWindow(wx.Frame):
         """
 
         # choose the file
-        dlg = wx.FileDialog(self, "Open ScratchV2 project", os.getcwd(), "", "*.sb2", wx.OPEN)
+        dlg = wx.FileDialog(self, "Open ScratchV2 project", os.getcwd(),
+                            "", "*.sb2", wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             # get the path
@@ -149,9 +167,11 @@ class ScratchInoConvWindow(wx.Frame):
 
         else:
             self.__label_status_msg.SetLabel("In Progress...")
-            self.__console.AppendText("\n=========== START UPLOAD ===========\n")
-            Thread(target=self.controller.scratch_into_arduino(self.__scratch_file,
-                                                               self.__choice_board_type.GetCurrentSelection())).start()
+            self.__console.AppendText(
+                "\n=========== START UPLOAD ===========\n")
+            Thread(target=self.controller.scratch_into_arduino(
+                self.__scratch_file,
+                self.__choice_board_type.GetCurrentSelection())).start()
 
     # PATTERN OBSERVER
     def notify(self, message):

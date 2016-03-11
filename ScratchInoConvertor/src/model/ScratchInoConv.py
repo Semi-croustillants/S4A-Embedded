@@ -5,7 +5,9 @@ import os
 
 import serial
 
-from model import JsonInoConvertorWithARTKV3 as JsonInoConvertor, UploadArduino, AutoDetectSerial, Message
+from model import JsonInoConvertorWithARTKV3 as JsonInoConvertor
+from model import JsonInoConvertorWithARTKV3 as UploadArduino
+from model import JsonInoConvertorWithARTKV3 as AutoDetectSerial, Message
 from AutoDetectSerial import AutoDetectSerialError
 from UploadArduino import UploadArduinoError
 from Message import Message as Message
@@ -38,7 +40,8 @@ class ScratchInoConv(object):
     def __notify_observers(self, message):
         """
         send for each observer a message object
-        :param message: Message object which contains a code identifier and a string method
+        :param message: Message object which contains a code identifier and a
+         string method
         """
         for obs in self.__observers:
             obs.notify(message)
@@ -50,7 +53,8 @@ class ScratchInoConv(object):
         :return:
         """
         if not hasattr(obs, 'notify'):
-            raise ValueError("First argument must be object with notify method")
+            raise ValueError(
+                "First argument must be object with notify method")
         self.__observers.append(obs)
 
     def __display_msg(self, message):
@@ -81,20 +85,26 @@ class ScratchInoConv(object):
             arduino_serial = self.__auto_detect_serial.get_arduinos_path()[0]
 
             # prepare the folder where the ino file will be
-            arduino_folder = self.TMP_FOLDER + os.sep + os.path.basename(scratch_file)
+            arduino_folder = self.TMP_FOLDER + os.sep + os.path.basename(
+                scratch_file)
             if not os.path.exists(arduino_folder):
                 os.makedirs(arduino_folder)
 
             # prepare the ino file
-            arduino_ino_file_name = arduino_folder + os.sep + os.path.basename(scratch_file) + self.INO_EXTENSION
+            arduino_ino_file_name = arduino_folder + os.sep + os.path.basename(
+                scratch_file) + self.INO_EXTENSION
 
             # Start conversion: scratch to ino
-            self.__json_ino_convertor = JsonInoConvertor.JsonInoConvertor(typeArduino=arduino_type)
-            self.__json_ino_convertor.convertSpriteScripts(scratch_file, arduino_ino_file_name)
+            self.__json_ino_convertor = JsonInoConvertor.JsonInoConvertor(
+                typeArduino=arduino_type)
+            self.__json_ino_convertor.convertSpriteScripts(
+                scratch_file,
+                arduino_ino_file_name)
 
             # Start upload
-            self.__upload_arduino = UploadArduino.UploadArduino(arduino_serial[1], arduino_serial[0],
-                                                                arduino_ino_file_name, self.__display_msg)
+            self.__upload_arduino = UploadArduino.UploadArduino(
+                arduino_serial[1], arduino_serial[0],
+                arduino_ino_file_name, self.__display_msg)
             self.__upload_arduino.start()
 
             # display succeed message
@@ -102,10 +112,14 @@ class ScratchInoConv(object):
 
             # display error message
         except AutoDetectSerialError, e:
-            self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
+            self.__display_msg(Message(
+                Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
         except UploadArduinoError, e:
-            self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
+            self.__display_msg(Message(
+                Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
         except serial.SerialException, e:
-            self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
+            self.__display_msg(Message(
+                Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
         except Exception, e:
-            self.__display_msg(Message(Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))
+            self.__display_msg(Message(
+                Message.ERROR_MESSAGE, ''.join(str(e1) for e1 in e.args)))

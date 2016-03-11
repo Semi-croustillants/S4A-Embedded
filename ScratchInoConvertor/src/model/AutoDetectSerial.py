@@ -21,7 +21,8 @@ class AutoDetectSerial(object):
         get usb devices information with a shell script
         :return: [ "usb device information" ]
         '''
-        proc = subprocess.Popen('./model/getUsbDevices.sh', stdout=subprocess.PIPE)
+        proc = subprocess.Popen('./model/getUsbDevices.sh',
+                                stdout=subprocess.PIPE)
         usb_device_tmp = proc.stdout.read()
         usb_device = usb_device_tmp.split("\n")
         return usb_device

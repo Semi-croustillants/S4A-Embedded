@@ -24,11 +24,13 @@ class UploadArduinoError(Exception):
 
 class UploadArduino(threading.Thread):
 
-    def __init__(self, arduino_type, serial_port, arduino_file, callback_log=None):
+    def __init__(self, arduino_type, serial_port, arduino_file,
+                 callback_log=None):
         """
         upload an arduino code to the arduino board
         :param arduino_type: the arduino model: uno, mega…
-        :param serial_port: the serial port where the arduino board is connected
+        :param serial_port: the serial port where the arduino board is
+          connected
         :param arduinofile: the arduino code to upload
         :callback_log: Message(code, message), see the Message class
         """
@@ -55,7 +57,8 @@ class UploadArduino(threading.Thread):
             sub.terminate()
             null.close()
         except OSError:
-            self.__display_error("Error: Arduino UI is not installed, please install it")
+            self.__display_error(
+                "Error: Arduino UI is not installed, please install it")
 
     def __arduino_ui_get_path_windows(self):
         """
@@ -74,11 +77,13 @@ class UploadArduino(threading.Thread):
         except WindowsError:
             # 64 bits installation
             try:
-                a_reg = _winreg.ConnectRegistry(None, _winreg.HKEY_LOCAL_MACHINE)
+                a_reg = _winreg.ConnectRegistry(
+                    None, _winreg.HKEY_LOCAL_MACHINE)
                 a_key = _winreg.OpenKey(a_reg, r"Software\\Arduino")
                 val = _winreg.QueryValueEx(a_key, "Install_Dir")[0]
             except WindowsError:
-                self.__display_error("Error: Arduino UI is not installed, please install it")
+                self.__display_error(
+                    "Error: Arduino UI is not installed, please install it")
         return val + "\\arduino.exe"
 
     def __get_arduino_arch_board(self, arduino_type):
@@ -94,7 +99,9 @@ class UploadArduino(threading.Thread):
             if arduino_arch:
                 return self.__arduino_type_list[key]
 
-        self.__display_error("Error: the Arduino board architecture is unknown, please contact us to support it")
+        self.__display_error(
+            "Error: the Arduino board architecture is unknown, \
+             please contact us to support it")
 
     def __display_error(self, error):
         if self.__callback_log is not None:
@@ -133,14 +140,17 @@ class UploadArduino(threading.Thread):
             ser = serial.Serial(self.__serial_port, 4600, timeout=1)
             ser.close()
         except serial.SerialException, e:
-            self.__display_error("could not open port " + self.__serial_port + " verify your permission")
+            self.__display_error(
+                "could not open port " +
+                self.__serial_port + " verify your permission")
 
         # prepare the command
         command = [arduino_exe, '--board', arduino_arch, '--port',
                    self.__serial_port, '--upload', self.__arduino_file]
 
         # execute and display
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # concat because the ui doesn't like
         # receiving line one after the other
@@ -169,5 +179,6 @@ class UploadArduino(threading.Thread):
                 self.__callback_log(Message(Message.ERROR_MESSAGE))
 
 if __name__ == '__main__':
-    upload_arduino = UploadArduino("uno", "/dev/ttyACM0", "/home/battosai/Arduino/buzzer/buzzer.ino")
+    upload_arduino = UploadArduino(
+        "uno", "/dev/ttyACM0", "/home/battosai/Arduino/buzzer/buzzer.ino")
     upload_arduino.start()

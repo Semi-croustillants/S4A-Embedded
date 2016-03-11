@@ -12,4 +12,5 @@ class Controller(object):
         self.__scratch_ino_conv = scratch_ino_conv
 
     def scratch_into_arduino(self, scratch_file, arduino_type):
-        self.__scratch_ino_conv.scratch_into_arduino(scratch_file, arduino_type)
+        self.__scratch_ino_conv.scratch_into_arduino(
+            scratch_file, arduino_type)

@@ -15,7 +15,7 @@ def display_help():
     print "  OPTION LIST:"
     print "      --UI               launch Scratch ino convertor UI"
     print "      -c, --command-line scratch_file [arduino_type]"
-    print "                         launch Scratch ino convertor in command line"
+    print "                       launch Scratch ino convertor in command line"
     print "                         arduino_type: 0 if uno, 1 else"
     print "      -h,   --help       display this help"
 
@@ -32,7 +32,8 @@ if __name__ == "__main__":
 
             app = wx.App(0)
             # wx.InitAllImageHandlers()
-            mainWindow = ScratchInoConvWindow.ScratchInoConvWindow(controller, None, wx.ID_ANY, "")
+            mainWindow = ScratchInoConvWindow.ScratchInoConvWindow(
+                controller, None, wx.ID_ANY, "")
             app.SetTopWindow(mainWindow)
             mainWindow.Show()
             scratch_ino_conv.add_observer(mainWindow)
