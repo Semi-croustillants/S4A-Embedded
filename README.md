@@ -40,6 +40,11 @@ Windows stand alone executable compiled with py2exe.
   * Python 2.7
   * Arduino IDE
   * Scratch v2
+  * Python pip [installation here](https://pip.pypa.io/en/stable/installing/)
+  * Install requirements with pip :
+    ```
+      pip install -r requirements
+    ```
 
 **Preparing Arduino IDE** :
 
